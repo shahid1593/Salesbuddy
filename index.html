@@ -17,6 +17,7 @@
             --accent: #D60058;        /* SBI Pink */
             --cyan: #00A3E0;          /* SBI Cyan */
             --green: #059669;         /* Success Green */
+            --whatsapp: #25D366;      /* WhatsApp Green */
             
             --bg-body: #f8fafc;
             --surface: #ffffff;
@@ -25,10 +26,7 @@
             --border-light: #e2e8f0;
             
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-            --shadow-md: 0 10px 30px -10px rgba(40, 0, 113, 0.15);
-            --shadow-hover: 0 20px 40px -10px rgba(40, 0, 113, 0.25);
             --radius-xl: 24px;
-            --radius-md: 12px;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -60,46 +58,24 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* =========================================
-           2. SOPHISTICATED HEADER
+           2. HEADER & DASHBOARD
            ========================================= */
         .hero-header {
             background: linear-gradient(145deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 50px 24px 40px 24px;
-            border-bottom-left-radius: 40px;
-            border-bottom-right-radius: 40px;
-            box-shadow: var(--shadow-md);
-            text-align: left;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        .hero-header::after {
-            content: ''; position: absolute; top: -50px; right: -50px;
-            width: 200px; height: 200px;
-            background: rgba(255,255,255,0.05); border-radius: 50%;
+            color: white; padding: 50px 24px 40px 24px;
+            border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
+            box-shadow: var(--shadow-sm); text-align: left; margin-bottom: 20px; position: relative;
         }
         .brand-pill {
             display: inline-block; background: rgba(255,255,255,0.15); backdrop-filter: blur(5px);
             padding: 6px 14px; border-radius: 30px; font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;
-            border: 1px solid rgba(255,255,255,0.2);
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.2);
         }
-        .app-name {
-            font-size: 32px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -0.5px;
-            background: linear-gradient(to right, #fff, #e0e7ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+        .app-name { font-size: 32px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -0.5px; background: linear-gradient(to right, #fff, #e0e7ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .tagline { font-size: 15px; opacity: 0.85; font-weight: 400; letter-spacing: 0.5px; }
 
-        /* =========================================
-           3. DASHBOARD CARDS
-           ========================================= */
-        .section-label {
-            font-size: 13px; font-weight: 700; color: var(--text-muted);
-            text-transform: uppercase; letter-spacing: 1.5px;
-            margin: 20px 0 10px 0; padding-left: 5px;
-        }
-
-        .dashboard-grid { display: grid; gap: 16px; }
+        .dashboard-grid { display: grid; gap: 16px; padding: 0 24px; }
+        .section-label { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin: 20px 0 10px 0; padding-left: 5px; }
 
         .action-card {
             background: var(--surface); padding: 24px; border-radius: var(--radius-xl);
@@ -107,115 +83,71 @@
             box-shadow: var(--shadow-sm); border: 1px solid var(--border-light);
             cursor: pointer; transition: all 0.3s ease;
         }
-        .action-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--primary); }
-
+        .action-card:hover { transform: translateY(-4px); border-color: var(--primary); }
         .card-content { display: flex; align-items: center; gap: 16px; }
-        
-        .card-icon-box {
-            width: 50px; height: 50px; border-radius: 16px;
-            display: flex; align-items: center; justify-content: center; font-size: 24px;
-        }
-        
+        .card-icon-box { width: 50px; height: 50px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
         .icon-blue { background: #eff6ff; color: var(--primary); }
         .icon-pink { background: #fdf2f8; color: var(--accent); }
-        .icon-cyan { background: #ecfeff; color: var(--cyan); }
         .icon-green { background: #ecfdf5; color: var(--green); }
-
         .card-text h3 { margin: 0; font-size: 16px; font-weight: 700; color: var(--text-main); }
         .card-text p { margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted); }
-        .arrow-icon { color: var(--border-light); transition: 0.3s; }
-        .action-card:hover .arrow-icon { color: var(--primary); transform: translateX(5px); }
-        
+        .arrow-icon { color: var(--border-light); }
+
         /* =========================================
-           4. SEARCH & OTHER UI
+           3. DOWNLOADS & ICONS
            ========================================= */
-        .nav-header { display: flex; align-items: center; padding: 20px 0; margin-bottom: 20px; }
-        .back-btn {
-            background: white; border: 1px solid var(--border-light); width: 40px; height: 40px;
-            border-radius: 12px; color: var(--text-main); font-size: 18px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); transition: 0.2s;
-        }
-        .back-btn:hover { background: var(--bg-body); }
-        .page-title { margin-left: 15px; font-size: 20px; font-weight: 700; color: var(--primary); }
-
-        .search-box {
-            background: white; padding: 20px; border-radius: 20px;
-            box-shadow: var(--shadow-sm); border: 1px solid var(--border-light);
-            margin-bottom: 24px;
-        }
-        .form-group { margin-bottom: 15px; }
-        .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
-        .form-select, .form-input {
-            width: 100%; padding: 14px; border: 1px solid var(--border-light);
-            border-radius: 12px; font-size: 14px; outline: none; transition: 0.2s;
-            background: var(--bg-body); color: var(--text-main); font-family: inherit;
-        }
-        .form-select:focus, .form-input:focus { border-color: var(--primary); background: white; }
-
-        .btn-search {
-            width: 100%; background: var(--primary); color: white; border: none;
-            padding: 16px; border-radius: 12px; font-size: 15px; font-weight: 700;
-            cursor: pointer; box-shadow: 0 4px 10px rgba(40,0,113,0.2); transition: 0.2s;
-        }
-        .btn-search:hover { background: var(--primary-dark); transform: translateY(-1px); }
-
-        /* Data Status Bar */
-        .data-status {
-            font-size: 11px; padding: 8px; margin-bottom: 15px; border-radius: 8px;
-            text-align: center;
-        }
-        .status-loading { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
-        .status-ready { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; display: none; }
-        .status-error { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; display: none; }
-
-        /* Manual Upload Button */
-        .file-upload-wrapper {
-            display: none; /* Hidden by default, shown on error */
-            margin-bottom: 15px; text-align: center;
-        }
-        .custom-file-upload {
-            border: 1px dashed var(--border-light); display: inline-block; padding: 6px 12px;
-            cursor: pointer; font-size: 12px; border-radius: 6px; background: white;
-        }
-
-        .hospital-list { display: flex; flex-direction: column; gap: 12px; }
-        .hospital-card {
-            background: white; padding: 16px; border-radius: 16px; border: 1px solid var(--border-light);
-            transition: 0.2s; display: flex; gap: 15px;
-        }
-        .hospital-card:hover { border-color: var(--cyan); transform: translateX(2px); }
-        .hosp-icon {
-            width: 40px; height: 40px; background: #e0f2fe; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center; color: #0284c7; font-size: 18px; flex-shrink: 0;
-        }
-        .hosp-details h4 { margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: var(--text-main); }
-        .hosp-details p { margin: 0 0 8px 0; font-size: 12px; color: var(--text-muted); line-height: 1.4; }
-        .badge {
-            display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;
-            background: #dcfce7; color: #166534; letter-spacing: 0.5px;
-        }
-
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
-        .empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
-
         .tab-wrapper { background: white; padding: 6px; border-radius: 16px; display: flex; box-shadow: var(--shadow-sm); margin-bottom: 24px; }
         .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
         .tab-btn.active-tab { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(40, 0, 113, 0.2); }
         .tab-content { display: none; animation: fadeIn 0.3s; }
         .tab-content.active-content { display: block; }
-        
-        .file-item { background: white; padding: 16px; border-radius: 16px; margin-bottom: 12px; display: flex; align-items: center; border: 1px solid transparent; transition: 0.2s; }
-        .file-icon { width: 40px; height: 40px; background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 15px; }
-        .file-info { flex: 1; }
-        .file-name { font-size: 14px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 2px; }
-        .file-meta { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
-        .btn-download { background: var(--bg-body); color: var(--primary); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-        
-        .status-card { background: white; border-radius: var(--radius-xl); padding: 40px 20px; text-align: center; border: 1px dashed var(--border-light); }
-        .status-icon { font-size: 48px; margin-bottom: 20px; display: block; opacity: 0.5; }
-        .status-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-        .status-desc { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
 
+        .file-item {
+            background: white; padding: 16px; border-radius: 16px; margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: space-between;
+            border: 1px solid transparent; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .file-left { display: flex; align-items: center; gap: 15px; }
+        .file-icon { width: 40px; height: 40px; background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .file-info span { display: block; }
+        .file-name { font-size: 14px; font-weight: 600; color: var(--text-main); }
+        .file-meta { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+
+        /* Interactive Buttons */
+        .action-buttons { display: flex; gap: 10px; }
+        
+        .btn-svg {
+            border: none; width: 42px; height: 42px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s;
+        }
+        
+        /* Download Button Style */
+        .btn-download-official { background: #f1f5f9; color: var(--primary); }
+        .btn-download-official:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+        .btn-download-official svg { width: 20px; height: 20px; fill: currentColor; }
+
+        /* WhatsApp Button Style */
+        .btn-whatsapp-official { background: #DCF8C6; color: #128C7E; }
+        .btn-whatsapp-official:hover { background: #25D366; color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); }
+        .btn-whatsapp-official svg { width: 22px; height: 22px; fill: currentColor; }
+
+        /* Search & Network Styles */
+        .nav-header { display: flex; align-items: center; padding: 20px 0; margin-bottom: 20px; }
+        .back-btn { background: white; border: 1px solid var(--border-light); width: 40px; height: 40px; border-radius: 12px; font-size: 18px; cursor: pointer; }
+        .page-title { margin-left: 15px; font-size: 20px; font-weight: 700; color: var(--primary); }
+        
+        .search-box { background: white; padding: 20px; border-radius: 20px; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
+        .form-select, .form-input, .btn-search { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border-light); margin-bottom: 10px; font-family: inherit; }
+        .btn-search { background: var(--primary); color: white; font-weight: 700; border: none; cursor: pointer; }
+        
+        .hospital-card { background: white; padding: 16px; border-radius: 16px; border: 1px solid var(--border-light); margin-bottom: 10px; display: flex; gap: 15px; }
+        .hosp-icon { width: 40px; height: 40px; background: #e0f2fe; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .hosp-details h4 { margin: 0; font-size: 14px; } .hosp-details p { margin: 5px 0; font-size: 12px; color: #666; }
+        .badge { background: #dcfce7; color: #166534; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+        
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        .status-loading { font-size:12px; text-align:center; padding:10px; color:#f59e0b; }
         .footer { text-align: center; font-size: 11px; color: var(--text-muted); padding: 20px; margin-top: auto; opacity: 0.6; }
 
     </style>
@@ -231,273 +163,276 @@
             <div class="tagline">One Touchpoint for partners</div>
         </header>
 
-        <div style="padding: 0 24px;">
+        <div class="dashboard-grid">
             <div class="section-label">Tools & Resources</div>
-            <div class="dashboard-grid">
-                
-                <div class="action-card" onclick="navigate('selection')">
-                    <div class="card-content">
-                        <div class="card-icon-box icon-blue">⚡</div>
-                        <div class="card-text"><h3>Quick Quote</h3><p>Generate premiums</p></div>
-                    </div>
-                    <div class="arrow-icon">&#10095;</div>
+            
+            <div class="action-card" onclick="navigate('selection')">
+                <div class="card-content">
+                    <div class="card-icon-box icon-blue">⚡</div>
+                    <div class="card-text"><h3>Quick Quote</h3><p>Generate premiums</p></div>
                 </div>
+                <div class="arrow-icon">&#10095;</div>
+            </div>
 
-                <div class="action-card" onclick="navigate('downloads')">
-                    <div class="card-content">
-                        <div class="card-icon-box icon-pink">📥</div>
-                        <div class="card-text"><h3>Downloads</h3><p>Brochures & Forms</p></div>
-                    </div>
-                    <div class="arrow-icon">&#10095;</div>
+            <div class="action-card" onclick="navigate('downloads')">
+                <div class="card-content">
+                    <div class="card-icon-box icon-pink">📥</div>
+                    <div class="card-text"><h3>Downloads</h3><p>Brochures & Forms</p></div>
                 </div>
+                <div class="arrow-icon">&#10095;</div>
+            </div>
 
-                <div class="action-card" onclick="navigate('network')">
-                    <div class="card-content">
-                        <div class="card-icon-box icon-green">📍</div>
-                        <div class="card-text"><h3>Cashless Network</h3><p>Locate Hospitals</p></div>
-                    </div>
-                    <div class="arrow-icon">&#10095;</div>
+            <div class="action-card" onclick="navigate('network')">
+                <div class="card-content">
+                    <div class="card-icon-box icon-green">📍</div>
+                    <div class="card-text"><h3>Cashless Network</h3><p>Locate Hospitals</p></div>
                 </div>
+                <div class="arrow-icon">&#10095;</div>
             </div>
         </div>
-        <div class="footer">Version 4.6 (Excel Data) | Internal Use Only</div>
+        <div class="footer">Version 5.1 (Interactive) | Internal Use Only</div>
     </div>
 
     <div id="selection" class="page">
-        <div class="nav-header">
-            <button class="back-btn" onclick="navigate('home')">&#8592;</button>
-            <div class="page-title">Select Product</div>
-        </div>
+        <div class="nav-header"><button class="back-btn" onclick="navigate('home')">&#8592;</button><div class="page-title">Select Product</div></div>
         <div class="dashboard-grid">
-            
             <a href="alpha_cal.html" class="action-card">
-                <div class="card-content">
-                    <div class="card-icon-box icon-blue">🏥</div>
-                    <div class="card-text">
-                        <h3>Health Alpha</h3>
-                        <p>Open Calculator</p>
-                    </div>
-                </div>
+                <div class="card-content"><div class="card-icon-box icon-blue">🏥</div><div class="card-text"><h3>Health Alpha</h3><p>Open Calculator</p></div></div>
                 <div class="arrow-icon">&#10095;</div>
             </a>
-
-            <div class="action-card" onclick="navigate('super-calc')">
-                <div class="card-content">
-                    <div class="card-icon-box icon-pink">🦸</div>
-                    <div class="card-text">
-                        <h3>Super Health</h3>
-                        <p>Comprehensive Coverage</p>
-                    </div>
-                </div>
+            <div class="action-card" onclick="alert('Coming Soon')">
+                <div class="card-content"><div class="card-icon-box icon-pink">🦸</div><div class="card-text"><h3>Super Health</h3><p>Comprehensive Coverage</p></div></div>
                 <div class="arrow-icon">&#10095;</div>
             </div>
         </div>
-    </div>
-
-    <div id="super-calc" class="page">
-        <div class="nav-header"><button class="back-btn" onclick="navigate('selection')">&#8592;</button><div class="page-title">Super Health</div></div>
-        <div class="status-card"><span class="status-icon">⚙️</span><div class="status-title">Coming Soon</div><div class="status-desc">Sophisticated engine under development.</div></div>
     </div>
 
     <div id="network" class="page">
         <div class="nav-header"><button class="back-btn" onclick="navigate('home')">&#8592;</button><div class="page-title">Cashless Network</div></div>
         
-        <div id="statusLoading" class="data-status status-loading">⌛ Connecting to database...</div>
-        <div id="statusReady" class="data-status status-ready">✅ Database Loaded Successfully</div>
-        <div id="statusError" class="data-status status-error">❌ Connection Failed.</div>
-
-        <div id="manualUpload" class="file-upload-wrapper">
-            <p style="font-size:11px; margin-bottom:5px; color:#666;">Could not auto-fetch. Please select <b>network_hospitals.xlsx</b> manually:</p>
-            <label class="custom-file-upload">
-                <input type="file" id="fileInput" accept=".xlsx, .xls" style="display:none;" onchange="handleFileSelect(event)">
-                📂 Select Excel File
-            </label>
+        <div id="statusLoading" class="status-loading">⌛ Loading Database...</div>
+        <div id="manualUpload" style="display:none; text-align:center; margin-bottom:15px;">
+            <input type="file" id="fileInput" onchange="handleFileSelect(event)" style="font-size:12px;">
         </div>
 
         <div class="search-box">
-            <div class="form-group">
-                <label class="form-label">Search Criteria</label>
-                <select id="searchType" class="form-select" onchange="updatePlaceholder()"><option value="state">State</option><option value="district">District</option><option value="city">City</option><option value="pincode">Pincode</option></select>
-            </div>
-            <div class="form-group"><label class="form-label">Location Detail</label><input type="text" id="searchInput" class="form-input" placeholder="Enter State name (e.g. Kerala)"></div>
+            <select id="searchType" class="form-select" onchange="toggleInputMode()">
+                <option value="state">State</option><option value="district">District</option><option value="city">City</option><option value="pincode">Pincode</option>
+            </select>
+            <input type="text" id="searchInput" class="form-input" placeholder="Enter Pincode" style="display:none;">
+            <select id="searchDropdown" class="form-select"><option value="">Select Option...</option></select>
             <button class="btn-search" onclick="performSearch()">Find Hospitals</button>
         </div>
-        <div class="section-label" id="resultLabel" style="display:none;">Search Results</div>
-        <div id="resultsContainer" class="hospital-list"><div class="empty-state"><div class="empty-icon">🏥</div><div>Select a criteria and search.</div></div></div>
+        <div class="section-label">Results</div>
+        <div id="resultsContainer" class="hospital-list"><div class="empty-state">Select criteria to search</div></div>
     </div>
 
     <div id="downloads" class="page">
         <div class="nav-header"><button class="back-btn" onclick="navigate('home')">&#8592;</button><div class="page-title">Downloads</div></div>
-        <div class="tab-wrapper"><button class="tab-btn active-tab" onclick="switchTab('brochures')">Brochures</button><button class="tab-btn" onclick="switchTab('forms')">Proposal Forms</button></div>
+        <div class="tab-wrapper"><button class="tab-btn active-tab" onclick="switchTab('brochures')">Brochures</button><button class="tab-btn" onclick="switchTab('forms')">Forms</button></div>
+        
         <div id="tab-brochures" class="tab-content active-content">
-            <div class="file-item"><div class="file-icon">📘</div><div class="file-info"><span class="file-name">Health Alpha Select</span><span class="file-meta">PDF • 2.4 MB</span></div><button class="btn-download" onclick="alert('Downloading...')">⬇</button></div>
-            <div class="file-item"><div class="file-icon">📘</div><div class="file-info"><span class="file-name">Super Health Plan</span><span class="file-meta">PDF • 3.1 MB</span></div><button class="btn-download" onclick="alert('Downloading...')">⬇</button></div>
+            
+            <div class="file-item">
+                <div class="file-left">
+                    <div class="file-icon">📘</div>
+                    <div class="file-info"><span class="file-name">Alpha</span><span class="file-meta">Product Brochure</span></div>
+                </div>
+                <div class="action-buttons">
+                    <a href="SBI General HealthAlpha_Leaflet - Alpha Select & Alpha Ultimate.pdf" download class="btn-svg btn-download-official" title="Download">
+                        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    </a>
+                    <button class="btn-svg btn-whatsapp-official" onclick="shareFile('Alpha', 'SBI General HealthAlpha_Leaflet - Alpha Select & Alpha Ultimate.pdf')" title="Share on WhatsApp">
+                        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="file-item">
+                <div class="file-left">
+                    <div class="file-icon">📘</div>
+                    <div class="file-info"><span class="file-name">Super Health</span><span class="file-meta">Product Brochure</span></div>
+                </div>
+                <div class="action-buttons">
+                    <a href="Super Health AIO.pdf" download class="btn-svg btn-download-official" title="Download"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a>
+                    <button class="btn-svg btn-whatsapp-official" onclick="shareFile('Super Health', 'Super Health AIO.pdf')" title="Share on WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
+                </div>
+            </div>
+
+            <div class="file-item">
+                <div class="file-left">
+                    <div class="file-icon">📘</div>
+                    <div class="file-info"><span class="file-name">Arogya Supreme</span><span class="file-meta">Product Brochure</span></div>
+                </div>
+                <div class="action-buttons">
+                    <a href="Arogya Supreme AIO.pdf" download class="btn-svg btn-download-official" title="Download"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a>
+                    <button class="btn-svg btn-whatsapp-official" onclick="shareFile('Arogya Supreme', 'Arogya Supreme AIO.pdf')" title="Share on WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
+                </div>
+            </div>
+
+            <div class="file-item">
+                <div class="file-left">
+                    <div class="file-icon">📘</div>
+                    <div class="file-info"><span class="file-name">Super Top-up</span><span class="file-meta">Product Brochure</span></div>
+                </div>
+                <div class="action-buttons">
+                    <a href="Super Top-Up.pdf" download class="btn-svg btn-download-official" title="Download"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a>
+                    <button class="btn-svg btn-whatsapp-official" onclick="shareFile('Super Top-up', 'Super Top-Up.pdf')" title="Share on WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
+                </div>
+            </div>
+
         </div>
+
         <div id="tab-forms" class="tab-content">
-            <div class="file-item"><div class="file-icon">📝</div><div class="file-info"><span class="file-name">Common Proposal Form</span><span class="file-meta">Health Retail</span></div><button class="btn-download" onclick="alert('Downloading...')">⬇</button></div>
-            <div class="file-item"><div class="file-icon">🏥</div><div class="file-info"><span class="file-name">Reimbursement Claim</span><span class="file-meta">Part A & Part B</span></div><button class="btn-download" onclick="alert('Downloading...')">⬇</button></div>
+            <div class="file-item">
+                <div class="file-left"><div class="file-icon">📝</div><div class="file-info"><span class="file-name">Common Proposal Form</span><span class="file-meta">PDF • Form</span></div></div>
+                <div class="action-buttons">
+                    <button class="btn-svg btn-download-official">⬇</button><button class="btn-svg btn-whatsapp-official">💬</button>
+                </div>
+            </div>
         </div>
     </div>
 
 </div>
 
 <script>
-    /* --- GLOBAL DATA STORAGE --- */
+    /* --- DATA & NAV --- */
     let hospitalData = [];
+    let uniqueLists = { state: new Set(), district: new Set(), city: new Set() };
 
     function navigate(pageId) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
         window.scrollTo(0,0);
-
-        // Try to load excel automatically when Network page is visited
-        if(pageId === 'network' && hospitalData.length === 0) {
-            loadExcelData();
-        }
+        if(pageId === 'network' && hospitalData.length === 0) loadExcelData();
     }
 
     function switchTab(tabName) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active-tab'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active-content'));
+        // Simple logic for 2 tabs
         const btns = document.querySelectorAll('.tab-btn');
         if(tabName === 'brochures') btns[0].classList.add('active-tab');
-        if(tabName === 'forms') btns[1].classList.add('active-tab');
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active-content'));
+        else btns[1].classList.add('active-tab');
         document.getElementById('tab-' + tabName).classList.add('active-content');
     }
 
-    /* --- EXCEL LOADING LOGIC --- */
+    /* --- WHATSAPP SHARING LOGIC --- */
+    async function shareFile(docName, filePath) {
+        // 1. Try Native Sharing (Works on Mobile if file is hosted)
+        if (navigator.share) {
+            try {
+                // To share a file via navigator.share, we must fetch it first
+                const response = await fetch(filePath);
+                const blob = await response.blob();
+                const file = new File([blob], filePath, { type: 'application/pdf' });
+                
+                await navigator.share({
+                    files: [file],
+                    title: docName,
+                    text: `Here is the ${docName} brochure.`
+                });
+                return; // Success
+            } catch (err) {
+                console.log("Native share failed or not supported, falling back to link/text.");
+            }
+        }
+
+        // 2. Fallback for Desktop / Incompatible Browsers
+        // Since we can't attach a local file to WhatsApp Web automatically, we send a clear message.
+        const text = `Here is the ${docName} Brochure PDF.`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    /* --- EXCEL DATA LOGIC --- */
+    function processRawData(rawData) {
+        uniqueLists = { state: new Set(), district: new Set(), city: new Set() };
+        return rawData.map(row => {
+            const newRow = {};
+            Object.keys(row).forEach(key => {
+                const cleanKey = key.toLowerCase().trim().replace(/\s+/g, '');
+                const val = row[key];
+                newRow[cleanKey] = val;
+                if(cleanKey === 'state' && val) uniqueLists.state.add(String(val).toUpperCase());
+                if(cleanKey === 'district' && val) uniqueLists.district.add(String(val).toUpperCase());
+                if(cleanKey === 'city' && val) uniqueLists.city.add(String(val).toUpperCase());
+            });
+            return newRow;
+        });
+    }
+
     function loadExcelData() {
         const url = "network_hospitals.xlsx";
-        
-        fetch(url)
-        .then(res => { 
-            if(!res.ok) throw new Error("File not found");
-            return res.arrayBuffer(); 
-        })
+        fetch(url).then(res => { if(!res.ok) throw new Error("File not found"); return res.arrayBuffer(); })
         .then(data => {
             const workbook = XLSX.read(data, {type: 'array'});
             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            hospitalData = XLSX.utils.sheet_to_json(firstSheet);
-            
-            // Normalize keys to Lowercase for easier searching
-            hospitalData = hospitalData.map(row => {
-                const newRow = {};
-                Object.keys(row).forEach(key => {
-                    newRow[key.toLowerCase().trim()] = row[key];
-                });
-                return newRow;
-            });
-
+            hospitalData = processRawData(XLSX.utils.sheet_to_json(firstSheet));
             document.getElementById('statusLoading').style.display = 'none';
-            document.getElementById('statusReady').style.display = 'block';
-            console.log("Loaded " + hospitalData.length + " hospitals.");
+            toggleInputMode();
         })
         .catch(err => {
-            console.error("Auto-fetch failed:", err);
             document.getElementById('statusLoading').style.display = 'none';
-            document.getElementById('statusError').style.display = 'block';
-            document.getElementById('statusError').innerText = "⚠️ Auto-load failed. Please select file manually.";
             document.getElementById('manualUpload').style.display = 'block';
         });
     }
 
-    /* --- MANUAL FILE SELECT FALLBACK --- */
     function handleFileSelect(event) {
         const file = event.target.files[0];
         if(!file) return;
-
         const reader = new FileReader();
         reader.onload = function(e) {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, {type: 'array'});
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            hospitalData = XLSX.utils.sheet_to_json(firstSheet);
-            
-            // Normalize
-            hospitalData = hospitalData.map(row => {
-                const newRow = {};
-                Object.keys(row).forEach(key => {
-                    newRow[key.toLowerCase().trim()] = row[key];
-                });
-                return newRow;
-            });
-
-            document.getElementById('statusError').style.display = 'none';
+            hospitalData = processRawData(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
             document.getElementById('manualUpload').style.display = 'none';
-            document.getElementById('statusReady').style.display = 'block';
-            document.getElementById('statusReady').innerText = "✅ Loaded Successfully!";
+            toggleInputMode();
         };
         reader.readAsArrayBuffer(file);
     }
 
-    /* --- SEARCH LOGIC --- */
-    function updatePlaceholder() {
+    /* --- SEARCH UI --- */
+    function toggleInputMode() {
         const type = document.getElementById('searchType').value;
-        const input = document.getElementById('searchInput');
-        input.value = ""; 
-        if(type === 'state') input.placeholder = "Enter State (e.g. Kerala)";
-        else if(type === 'district') input.placeholder = "Enter District (e.g. Kollam)";
-        else if(type === 'city') input.placeholder = "Enter City (e.g. Kochi)";
-        else if(type === 'pincode') input.placeholder = "Enter Pincode (e.g. 691001)";
+        const textInput = document.getElementById('searchInput');
+        const dropdown = document.getElementById('searchDropdown');
+
+        if(type === 'pincode') {
+            textInput.style.display = 'block'; dropdown.style.display = 'none'; textInput.value = "";
+        } else {
+            textInput.style.display = 'none'; dropdown.style.display = 'block';
+            dropdown.innerHTML = '<option value="">Select ' + type.charAt(0).toUpperCase() + type.slice(1) + '...</option>';
+            const list = Array.from(uniqueLists[type] || []).sort();
+            list.forEach(item => {
+                const opt = document.createElement('option'); opt.value = item; opt.innerText = item; dropdown.appendChild(opt);
+            });
+        }
     }
 
     function performSearch() {
-        const type = document.getElementById('searchType').value; // state, district, city, pincode
-        const val = document.getElementById('searchInput').value.toLowerCase().trim();
+        const type = document.getElementById('searchType').value;
         const container = document.getElementById('resultsContainer');
-        const label = document.getElementById('resultLabel');
-        label.style.display = 'block';
         container.innerHTML = '';
 
-        if(hospitalData.length === 0) {
-            container.innerHTML = '<div class="empty-state">⚠️ Database not loaded yet.</div>';
-            return;
-        }
+        if(hospitalData.length === 0) { container.innerHTML = '<div class="empty-state">Database not loaded</div>'; return; }
 
-        if(val.length < 3) { 
-            container.innerHTML = '<div class="empty-state">Please enter at least 3 characters.</div>'; 
-            return; 
-        }
+        let val = (type === 'pincode') ? document.getElementById('searchInput').value.toLowerCase().trim() : document.getElementById('searchDropdown').value.toLowerCase();
+        if(val.length < 3) { container.innerHTML = '<div class="empty-state">Enter valid search term</div>'; return; }
 
-        /* Assumption: Excel Columns map to keys: 'hospitalname', 'state', 'district', 'city', 'pincode', 'address' 
-           (Because we lowercased them in loadExcelData)
-        */
         const results = hospitalData.filter(h => {
-            // Safe check: ensure field exists before toString()
-            const field = h[type] ? h[type].toString().toLowerCase() : "";
-            return field.includes(val);
+            let rawVal = h[type];
+            return (rawVal !== undefined && rawVal !== null) ? String(rawVal).toLowerCase().includes(val) : false;
         });
 
-        if(results.length === 0) { 
-            container.innerHTML = '<div class="empty-state">No network hospitals found.</div>'; 
-        } else {
-            results.slice(0, 50).forEach(h => { // Limit to 50 results for performance
+        if(results.length === 0) container.innerHTML = '<div class="empty-state">No hospitals found</div>';
+        else {
+            results.slice(0, 50).forEach(h => { 
                 const card = document.createElement('div'); card.className = 'hospital-card';
-                // Fallbacks for display
-                const name = h['hospitalname'] || h['hospital name'] || "Unknown Hospital";
-                const addr = h['address'] || "";
-                const pin = h['pincode'] || "";
-                const city = h['city'] || "";
-
-                card.innerHTML = `
-                    <div class="hosp-icon">🏥</div>
-                    <div class="hosp-details">
-                        <h4>${name}</h4>
-                        <p>${addr}, ${city}<br>PIN: ${pin}</p>
-                        <span class="badge">Cashless</span>
-                    </div>
-                `;
+                card.innerHTML = `<div class="hosp-icon">🏥</div><div class="hosp-details"><h4>${h['hospitalname']||"Hospital"}</h4><p>${h['address']||""}, ${h['city']||""}<br>PIN: ${h['pincode']||""}</p><span class="badge">Cashless</span></div>`;
                 container.appendChild(card);
             });
-            if(results.length > 50) {
-                const limitMsg = document.createElement('div');
-                limitMsg.style.textAlign='center'; limitMsg.style.fontSize='10px'; limitMsg.style.color='#999';
-                limitMsg.innerText = `Showing first 50 of ${results.length} results...`;
-                container.appendChild(limitMsg);
-            }
         }
     }
 </script>
 </body>
 </html>
-
