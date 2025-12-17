@@ -5,26 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SBI General - Sales Buddy</title>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
         /* =========================================
            1. CORE VARIABLES & RESET
            ========================================= */
         :root {
-            /* Brand Colors */
             --primary: #280071;       /* Deep SBI Blue */
             --primary-dark: #1a004b;
             --accent: #D60058;        /* SBI Pink */
             --cyan: #00A3E0;          /* SBI Cyan */
             --green: #059669;         /* Success Green */
             
-            /* UI Colors */
             --bg-body: #f8fafc;
             --surface: #ffffff;
             --text-main: #1e293b;
             --text-muted: #64748b;
             --border-light: #e2e8f0;
             
-            /* Shadows & Radius */
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
             --shadow-md: 0 10px 30px -10px rgba(40, 0, 113, 0.15);
             --shadow-hover: 0 20px 40px -10px rgba(40, 0, 113, 0.25);
@@ -160,6 +159,25 @@
         }
         .btn-search:hover { background: var(--primary-dark); transform: translateY(-1px); }
 
+        /* Data Status Bar */
+        .data-status {
+            font-size: 11px; padding: 8px; margin-bottom: 15px; border-radius: 8px;
+            text-align: center;
+        }
+        .status-loading { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+        .status-ready { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; display: none; }
+        .status-error { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; display: none; }
+
+        /* Manual Upload Button */
+        .file-upload-wrapper {
+            display: none; /* Hidden by default, shown on error */
+            margin-bottom: 15px; text-align: center;
+        }
+        .custom-file-upload {
+            border: 1px dashed var(--border-light); display: inline-block; padding: 6px 12px;
+            cursor: pointer; font-size: 12px; border-radius: 6px; background: white;
+        }
+
         .hospital-list { display: flex; flex-direction: column; gap: 12px; }
         .hospital-card {
             background: white; padding: 16px; border-radius: 16px; border: 1px solid var(--border-light);
@@ -225,14 +243,6 @@
                     <div class="arrow-icon">&#10095;</div>
                 </div>
 
-                <div class="action-card" onclick="navigate('network')">
-                    <div class="card-content">
-                        <div class="card-icon-box icon-green">📍</div>
-                        <div class="card-text"><h3>Cashless Network</h3><p>Locate Hospitals</p></div>
-                    </div>
-                    <div class="arrow-icon">&#10095;</div>
-                </div>
-
                 <div class="action-card" onclick="navigate('downloads')">
                     <div class="card-content">
                         <div class="card-icon-box icon-pink">📥</div>
@@ -241,9 +251,16 @@
                     <div class="arrow-icon">&#10095;</div>
                 </div>
 
+                <div class="action-card" onclick="navigate('network')">
+                    <div class="card-content">
+                        <div class="card-icon-box icon-green">📍</div>
+                        <div class="card-text"><h3>Cashless Network</h3><p>Locate Hospitals</p></div>
+                    </div>
+                    <div class="arrow-icon">&#10095;</div>
+                </div>
             </div>
         </div>
-        <div class="footer">Version 4.6 | Internal Use Only</div>
+        <div class="footer">Version 4.6 (Excel Data) | Internal Use Only</div>
     </div>
 
     <div id="selection" class="page">
@@ -284,6 +301,19 @@
 
     <div id="network" class="page">
         <div class="nav-header"><button class="back-btn" onclick="navigate('home')">&#8592;</button><div class="page-title">Cashless Network</div></div>
+        
+        <div id="statusLoading" class="data-status status-loading">⌛ Connecting to database...</div>
+        <div id="statusReady" class="data-status status-ready">✅ Database Loaded Successfully</div>
+        <div id="statusError" class="data-status status-error">❌ Connection Failed.</div>
+
+        <div id="manualUpload" class="file-upload-wrapper">
+            <p style="font-size:11px; margin-bottom:5px; color:#666;">Could not auto-fetch. Please select <b>network_hospitals.xlsx</b> manually:</p>
+            <label class="custom-file-upload">
+                <input type="file" id="fileInput" accept=".xlsx, .xls" style="display:none;" onchange="handleFileSelect(event)">
+                📂 Select Excel File
+            </label>
+        </div>
+
         <div class="search-box">
             <div class="form-group">
                 <label class="form-label">Search Criteria</label>
@@ -312,10 +342,18 @@
 </div>
 
 <script>
+    /* --- GLOBAL DATA STORAGE --- */
+    let hospitalData = [];
+
     function navigate(pageId) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
         window.scrollTo(0,0);
+
+        // Try to load excel automatically when Network page is visited
+        if(pageId === 'network' && hospitalData.length === 0) {
+            loadExcelData();
+        }
     }
 
     function switchTab(tabName) {
@@ -327,51 +365,139 @@
         document.getElementById('tab-' + tabName).classList.add('active-content');
     }
 
-    // Network Search Logic (Mock Data)
-    const mockHospitals = [
-        { name: "Travancore Medicity", city: "Kollam", district: "Kollam", state: "Kerala", pin: "691020", address: "Mylapore, Umayanalloor P.O" },
-        { name: "N.S Memorial Hospital", city: "Kollam", district: "Kollam", state: "Kerala", pin: "691001", address: "Palathara, Bypass Road" },
-        { name: "KIMS Health", city: "Trivandrum", district: "Thiruvananthapuram", state: "Kerala", pin: "695029", address: "P.B. No. 1, Anayara" },
-        { name: "Aster Medcity", city: "Kochi", district: "Ernakulam", state: "Kerala", pin: "682027", address: "Kuttisahib Road, Cheranelloor" },
-        { name: "Apollo Hospital", city: "Bangalore", district: "Bangalore", state: "Karnataka", pin: "560076", address: "154/11, Bannerghatta Road" },
-        { name: "Lisie Hospital", city: "Kochi", district: "Ernakulam", state: "Kerala", pin: "682018", address: "Kaloor, Ernakulam" },
-        { name: "Bishop Benziger", city: "Kollam", district: "Kollam", state: "Kerala", pin: "691001", address: "Beach Road, Kollam" }
-    ];
+    /* --- EXCEL LOADING LOGIC --- */
+    function loadExcelData() {
+        const url = "network_hospitals.xlsx";
+        
+        fetch(url)
+        .then(res => { 
+            if(!res.ok) throw new Error("File not found");
+            return res.arrayBuffer(); 
+        })
+        .then(data => {
+            const workbook = XLSX.read(data, {type: 'array'});
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            hospitalData = XLSX.utils.sheet_to_json(firstSheet);
+            
+            // Normalize keys to Lowercase for easier searching
+            hospitalData = hospitalData.map(row => {
+                const newRow = {};
+                Object.keys(row).forEach(key => {
+                    newRow[key.toLowerCase().trim()] = row[key];
+                });
+                return newRow;
+            });
 
+            document.getElementById('statusLoading').style.display = 'none';
+            document.getElementById('statusReady').style.display = 'block';
+            console.log("Loaded " + hospitalData.length + " hospitals.");
+        })
+        .catch(err => {
+            console.error("Auto-fetch failed:", err);
+            document.getElementById('statusLoading').style.display = 'none';
+            document.getElementById('statusError').style.display = 'block';
+            document.getElementById('statusError').innerText = "⚠️ Auto-load failed. Please select file manually.";
+            document.getElementById('manualUpload').style.display = 'block';
+        });
+    }
+
+    /* --- MANUAL FILE SELECT FALLBACK --- */
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if(!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            hospitalData = XLSX.utils.sheet_to_json(firstSheet);
+            
+            // Normalize
+            hospitalData = hospitalData.map(row => {
+                const newRow = {};
+                Object.keys(row).forEach(key => {
+                    newRow[key.toLowerCase().trim()] = row[key];
+                });
+                return newRow;
+            });
+
+            document.getElementById('statusError').style.display = 'none';
+            document.getElementById('manualUpload').style.display = 'none';
+            document.getElementById('statusReady').style.display = 'block';
+            document.getElementById('statusReady').innerText = "✅ Loaded Successfully!";
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    /* --- SEARCH LOGIC --- */
     function updatePlaceholder() {
         const type = document.getElementById('searchType').value;
         const input = document.getElementById('searchInput');
+        input.value = ""; 
         if(type === 'state') input.placeholder = "Enter State (e.g. Kerala)";
         else if(type === 'district') input.placeholder = "Enter District (e.g. Kollam)";
         else if(type === 'city') input.placeholder = "Enter City (e.g. Kochi)";
         else if(type === 'pincode') input.placeholder = "Enter Pincode (e.g. 691001)";
-        input.value = ""; 
     }
 
     function performSearch() {
-        const type = document.getElementById('searchType').value;
+        const type = document.getElementById('searchType').value; // state, district, city, pincode
         const val = document.getElementById('searchInput').value.toLowerCase().trim();
         const container = document.getElementById('resultsContainer');
         const label = document.getElementById('resultLabel');
         label.style.display = 'block';
         container.innerHTML = '';
-        if(val.length < 3) { container.innerHTML = '<div class="empty-state">Please enter at least 3 characters.</div>'; return; }
-        const results = mockHospitals.filter(h => {
-            if(type === 'state') return h.state.toLowerCase().includes(val);
-            if(type === 'district') return h.district.toLowerCase().includes(val);
-            if(type === 'city') return h.city.toLowerCase().includes(val);
-            if(type === 'pincode') return h.pin.includes(val);
-            return false;
+
+        if(hospitalData.length === 0) {
+            container.innerHTML = '<div class="empty-state">⚠️ Database not loaded yet.</div>';
+            return;
+        }
+
+        if(val.length < 3) { 
+            container.innerHTML = '<div class="empty-state">Please enter at least 3 characters.</div>'; 
+            return; 
+        }
+
+        /* Assumption: Excel Columns map to keys: 'hospitalname', 'state', 'district', 'city', 'pincode', 'address' 
+           (Because we lowercased them in loadExcelData)
+        */
+        const results = hospitalData.filter(h => {
+            // Safe check: ensure field exists before toString()
+            const field = h[type] ? h[type].toString().toLowerCase() : "";
+            return field.includes(val);
         });
-        if(results.length === 0) { container.innerHTML = '<div class="empty-state">No network hospitals found.</div>'; } 
-        else {
-            results.forEach(h => {
+
+        if(results.length === 0) { 
+            container.innerHTML = '<div class="empty-state">No network hospitals found.</div>'; 
+        } else {
+            results.slice(0, 50).forEach(h => { // Limit to 50 results for performance
                 const card = document.createElement('div'); card.className = 'hospital-card';
-                card.innerHTML = `<div class="hosp-icon">🏥</div><div class="hosp-details"><h4>${h.name}</h4><p>${h.address}, ${h.city}<br>PIN: ${h.pin}</p><span class="badge">Cashless</span></div>`;
+                // Fallbacks for display
+                const name = h['hospitalname'] || h['hospital name'] || "Unknown Hospital";
+                const addr = h['address'] || "";
+                const pin = h['pincode'] || "";
+                const city = h['city'] || "";
+
+                card.innerHTML = `
+                    <div class="hosp-icon">🏥</div>
+                    <div class="hosp-details">
+                        <h4>${name}</h4>
+                        <p>${addr}, ${city}<br>PIN: ${pin}</p>
+                        <span class="badge">Cashless</span>
+                    </div>
+                `;
                 container.appendChild(card);
             });
+            if(results.length > 50) {
+                const limitMsg = document.createElement('div');
+                limitMsg.style.textAlign='center'; limitMsg.style.fontSize='10px'; limitMsg.style.color='#999';
+                limitMsg.innerText = `Showing first 50 of ${results.length} results...`;
+                container.appendChild(limitMsg);
+            }
         }
     }
 </script>
 </body>
 </html>
+
