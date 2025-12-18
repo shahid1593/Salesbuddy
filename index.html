@@ -174,14 +174,8 @@
         .search-box { background: white; padding: 20px; border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); margin-bottom: 24px; }
         .form-group { margin-bottom: 15px; }
         .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
-        
-        .form-select, .form-input { 
-            width: 100%; padding: 14px; border: 1px solid var(--border-light); 
-            border-radius: 12px; font-size: 14px; outline: none; transition: 0.2s; 
-            background: var(--bg-body); color: var(--text-main); font-family: inherit; 
-        }
+        .form-select, .form-input { width: 100%; padding: 14px; border: 1px solid var(--border-light); border-radius: 12px; font-size: 14px; outline: none; transition: 0.2s; background: var(--bg-body); color: var(--text-main); font-family: inherit; }
         .form-select:focus, .form-input:focus { border-color: var(--primary); background: white; }
-        
         .btn-search { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(40,0,113,0.2); transition: 0.2s; }
         .btn-search:hover { background: var(--primary-dark); transform: translateY(-1px); }
 
@@ -290,7 +284,7 @@
 
             </div>
         </div>
-        <div class="footer">Version 7.3 (Rearranged Files) | Internal Use Only</div>
+        <div class="footer">Version 7.4 (Super Health Linked) | Internal Use Only</div>
     </div>
 
     <div id="selection" class="page">
@@ -306,19 +300,15 @@
                 </div>
                 <div class="arrow-icon">&#10095;</div>
             </a>
-            <div class="action-card" onclick="navigate('super-calc')">
+            
+            <a href="superhealthcalc.html" class="action-card">
                 <div class="card-content">
                     <div class="card-icon-box icon-pink">🦸</div>
-                    <div class="card-text"><h3>Super Health</h3><p>Comprehensive Coverage</p></div>
+                    <div class="card-text"><h3>Super Health</h3><p>Open Calculator</p></div>
                 </div>
                 <div class="arrow-icon">&#10095;</div>
-            </div>
+            </a>
         </div>
-    </div>
-
-    <div id="super-calc" class="page">
-        <div class="nav-header"><button class="back-btn" onclick="navigate('selection')">&#8592;</button><div class="page-title">Super Health</div></div>
-        <div class="status-card"><span class="status-icon">⚙️</span><div class="status-title">Coming Soon</div><div class="status-desc">Sophisticated engine under development.</div></div>
     </div>
 
     <div id="network" class="page">
