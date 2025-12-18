@@ -284,7 +284,7 @@
 
             </div>
         </div>
-        <div class="footer">Version 7.4 (Super Health Linked) | Internal Use Only</div>
+        <div class="footer">Version 7.5 (Internal Viewers) | Internal Use Only</div>
     </div>
 
     <div id="selection" class="page">
@@ -293,22 +293,30 @@
             <div class="page-title">Select Product</div>
         </div>
         <div class="dashboard-grid">
-            <a href="alpha_cal.html" class="action-card">
+            <div class="action-card" onclick="openExternal('alpha_cal.html', 'Health Alpha')">
                 <div class="card-content">
                     <div class="card-icon-box icon-blue">🏥</div>
-                    <div class="card-text"><h3>Health Alpha</h3><p>Open Calculator</p></div>
+                    <div class="card-text"><h3>Health Alpha</h3><p>Highly customizable insurance plan with 50+ benefits.</p></div>
                 </div>
                 <div class="arrow-icon">&#10095;</div>
-            </a>
+            </div>
             
-            <a href="superhealthcalc.html" class="action-card">
+            <div class="action-card" onclick="openExternal('superhealthcalc.html', 'Super Health')">
                 <div class="card-content">
                     <div class="card-icon-box icon-pink">🦸</div>
-                    <div class="card-text"><h3>Super Health</h3><p>Open Calculator</p></div>
+                    <div class="card-text"><h3>Super Health</h3><p>Comprehensive coverage for enhanced protection.</p></div>
                 </div>
                 <div class="arrow-icon">&#10095;</div>
-            </a>
+            </div>
         </div>
+    </div>
+
+    <div id="external-view" class="page" style="padding-left:0; padding-right:0; padding-bottom:0;">
+        <div class="nav-header" style="padding: 10px 20px;">
+            <button class="back-btn" onclick="navigate('selection')">&#8592;</button>
+            <div class="page-title" id="external-title">Calculator</div>
+        </div>
+        <iframe id="external-frame" style="width:100%; height: calc(100vh - 100px); border:none; display:block;" src=""></iframe>
     </div>
 
     <div id="network" class="page">
@@ -396,6 +404,7 @@
                 <a href="tel:1800221111" class="interact-btn btn-call" title="Call Now">📞</a>
             </div>
         </div>
+
         <div class="section-label">For Customers (Claims)</div>
         <div class="support-card">
             <div class="support-header"><div class="support-icon">🏥</div><div class="support-title">Health Claims</div></div>
@@ -405,12 +414,14 @@
             </div>
             <div class="support-row"><div><div class="contact-label">Email ID</div><a href="mailto:sbig.health@sbigeneral.in" class="email-link">sbig.health@sbigeneral.in</a></div></div>
         </div>
+
         <div class="section-label">For Any Query</div>
         <div class="support-card">
             <div class="support-header"><div class="support-icon">📞</div><div class="support-title">Customer Care</div></div>
             <div class="support-row"><div><div class="contact-label">Toll Free</div><a href="tel:18001021111" class="contact-value">1800 102 1111</a></div></div>
             <div class="support-row"><div><div class="contact-label">Email ID</div><a href="mailto:customer.care@sbigeneral.in" class="email-link">customer.care@sbigeneral.in</a></div></div>
         </div>
+
         <div class="section-label">Downloads</div>
         <div class="file-item" style="border: 1px solid var(--accent);">
             <div class="file-icon" style="background:#fdf2f8; color:var(--accent);">📄</div>
@@ -445,6 +456,13 @@
         if(tabName === 'forms') btns[1].classList.add('active-tab');
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active-content'));
         document.getElementById('tab-' + tabName).classList.add('active-content');
+    }
+
+    /* --- EXTERNAL CALCULATOR OPENER --- */
+    function openExternal(url, title) {
+        document.getElementById('external-title').innerText = title;
+        document.getElementById('external-frame').src = url;
+        navigate('external-view');
     }
 
     /* --- WHATSAPP SHARE --- */
@@ -482,7 +500,7 @@
             const rawJson = XLSX.utils.sheet_to_json(firstSheet);
             hospitalData = processRawData(rawJson);
             document.getElementById('statusLoading').style.display = 'none';
-            updateSuggestions(); // Initialize datalist
+            updateSuggestions();
         }).catch(err => {
             console.error("Auto-fetch failed:", err);
             document.getElementById('statusLoading').style.display = 'none';
@@ -518,7 +536,6 @@
         input.value = "";
         input.placeholder = `Type ${type.charAt(0).toUpperCase() + type.slice(1)}...`;
         
-        // Populate Datalist for Autocomplete
         datalist.innerHTML = '';
         const list = Array.from(uniqueLists[type] || []).sort();
         list.forEach(item => {
@@ -555,7 +572,6 @@
             return String(rawVal).toLowerCase().includes(val);
         });
 
-        // Show Count and PDF Button
         header.style.display = 'flex';
         countDisplay.innerText = `Found: ${results.length} Hospitals`;
 
@@ -587,7 +603,6 @@
         const val = document.getElementById('searchInput').value;
         const count = document.getElementById('resultCount').innerText;
         
-        // Add PDF Header
         element.innerHTML = `
             <div style="padding: 20px; font-family: sans-serif;">
                 <h1 style="color:#280071; text-align:center; margin-bottom:5px;">SBI General Hospital List</h1>
