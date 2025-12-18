@@ -6,6 +6,7 @@
     <title>SBI General - Sales Buddy</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         /* =========================================
@@ -173,8 +174,14 @@
         .search-box { background: white; padding: 20px; border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); margin-bottom: 24px; }
         .form-group { margin-bottom: 15px; }
         .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
-        .form-select, .form-input { width: 100%; padding: 14px; border: 1px solid var(--border-light); border-radius: 12px; font-size: 14px; outline: none; transition: 0.2s; background: var(--bg-body); color: var(--text-main); font-family: inherit; }
+        
+        .form-select, .form-input { 
+            width: 100%; padding: 14px; border: 1px solid var(--border-light); 
+            border-radius: 12px; font-size: 14px; outline: none; transition: 0.2s; 
+            background: var(--bg-body); color: var(--text-main); font-family: inherit; 
+        }
         .form-select:focus, .form-input:focus { border-color: var(--primary); background: white; }
+        
         .btn-search { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(40,0,113,0.2); transition: 0.2s; }
         .btn-search:hover { background: var(--primary-dark); transform: translateY(-1px); }
 
@@ -194,6 +201,12 @@
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
         .empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
 
+        /* Search Header (Results) */
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; display: none; }
+        .result-count { font-size: 14px; font-weight: 700; color: var(--primary); }
+        .pdf-dl-btn { background: #ef4444; color: white; border: none; padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+
+        /* Tabs */
         .tab-wrapper { background: white; padding: 6px; border-radius: 16px; display: flex; box-shadow: var(--shadow-sm); margin-bottom: 24px; }
         .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
         .tab-btn.active-tab { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(40, 0, 113, 0.2); }
@@ -277,7 +290,7 @@
 
             </div>
         </div>
-        <div class="footer">Version 6.2 (Rearranged) | Internal Use Only</div>
+        <div class="footer">Version 7.3 (Rearranged Files) | Internal Use Only</div>
     </div>
 
     <div id="selection" class="page">
@@ -286,25 +299,17 @@
             <div class="page-title">Select Product</div>
         </div>
         <div class="dashboard-grid">
-            
             <a href="alpha_cal.html" class="action-card">
                 <div class="card-content">
                     <div class="card-icon-box icon-blue">🏥</div>
-                    <div class="card-text">
-                        <h3>Health Alpha</h3>
-                        <p>Open Calculator</p>
-                    </div>
+                    <div class="card-text"><h3>Health Alpha</h3><p>Open Calculator</p></div>
                 </div>
                 <div class="arrow-icon">&#10095;</div>
             </a>
-
             <div class="action-card" onclick="navigate('super-calc')">
                 <div class="card-content">
                     <div class="card-icon-box icon-pink">🦸</div>
-                    <div class="card-text">
-                        <h3>Super Health</h3>
-                        <p>Comprehensive Coverage</p>
-                    </div>
+                    <div class="card-text"><h3>Super Health</h3><p>Comprehensive Coverage</p></div>
                 </div>
                 <div class="arrow-icon">&#10095;</div>
             </div>
@@ -333,158 +338,97 @@
         <div class="search-box">
             <div class="form-group">
                 <label class="form-label">Search Criteria</label>
-                <select id="searchType" class="form-select" onchange="toggleInputMode()">
+                <select id="searchType" class="form-select" onchange="updateSuggestions()">
                     <option value="state">State</option>
                     <option value="district">District</option>
                     <option value="city">City</option>
-                    <option value="pincode">Pincode</option>
                 </select>
             </div>
             
             <div class="form-group">
                 <label class="form-label">Location Detail</label>
-                <input type="text" id="searchInput" class="form-input" placeholder="Enter Pincode" style="display:none;">
-                <select id="searchDropdown" class="form-select">
-                    <option value="">Select Option...</option>
-                </select>
+                <input type="text" id="searchInput" list="dynamicOptions" class="form-input" placeholder="Type to search..." autocomplete="off">
+                <datalist id="dynamicOptions"></datalist>
             </div>
 
             <button class="btn-search" onclick="performSearch()">Find Hospitals</button>
         </div>
-        <div class="section-label" id="resultLabel" style="display:none;">Search Results</div>
-        <div id="resultsContainer" class="hospital-list"><div class="empty-state"><div class="empty-icon">🏥</div><div>Select a criteria and search.</div></div></div>
+
+        <div id="resultsHeader" class="results-header">
+            <div id="resultCount" class="result-count">Found: 0 Hospitals</div>
+            <button class="pdf-dl-btn" onclick="downloadPDF()"><span style="font-size:14px;">📄</span> PDF</button>
+        </div>
+
+        <div id="resultsContainer" class="hospital-list">
+            <div class="empty-state"><div class="empty-icon">🏥</div><div>Select a criteria and type to find network hospitals.</div></div>
+        </div>
     </div>
 
     <div id="downloads" class="page">
         <div class="nav-header"><button class="back-btn" onclick="navigate('home')">&#8592;</button><div class="page-title">Downloads</div></div>
-        <div class="tab-wrapper"><button class="tab-btn active-tab" onclick="switchTab('brochures')">Brochures</button><button class="tab-btn" onclick="switchTab('forms')">Proposal Forms</button></div>
+        <div class="tab-wrapper"><button class="tab-btn active-tab" onclick="switchTab('brochures')">Brochures</button><button class="tab-btn" onclick="switchTab('forms')">Forms & Files</button></div>
         
         <div id="tab-brochures" class="tab-content active-content">
             <div class="file-item">
-                <div class="file-icon">📘</div>
-                <div class="file-info"><span class="file-name">Alpha</span><span class="file-meta">PDF • Product Brochure</span></div>
-                <div class="action-buttons">
-                    <a href="SBI General HealthAlpha_Leaflet - Alpha Select & Alpha Ultimate.pdf" download class="interact-btn btn-dl" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a>
-                    <button class="interact-btn btn-wa" onclick="shareWa('Alpha Brochure')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
-                </div>
-            </div>
-
+                <div class="file-icon">📘</div><div class="file-info"><span class="file-name">Alpha</span><span class="file-meta">PDF • Product Brochure</span></div>
+                <div class="action-buttons"><a href="SBI General HealthAlpha_Leaflet - Alpha Select & Alpha Ultimate.pdf" download class="interact-btn btn-dl" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a><button class="interact-btn btn-wa" onclick="shareWa('Alpha Brochure')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button></div></div>
             <div class="file-item">
-                <div class="file-icon">📘</div>
-                <div class="file-info"><span class="file-name">Super Health</span><span class="file-meta">PDF • Product Brochure</span></div>
-                <div class="action-buttons">
-                    <a href="Super Health AIO.pdf" download class="interact-btn btn-dl" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a>
-                    <button class="interact-btn btn-wa" onclick="shareWa('Super Health Brochure')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
-                </div>
-            </div>
-
+                <div class="file-icon">📘</div><div class="file-info"><span class="file-name">Super Health</span><span class="file-meta">PDF • Product Brochure</span></div>
+                <div class="action-buttons"><a href="Super Health AIO.pdf" download class="interact-btn btn-dl" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a><button class="interact-btn btn-wa" onclick="shareWa('Super Health Brochure')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button></div></div>
             <div class="file-item">
-                <div class="file-icon">📘</div>
-                <div class="file-info"><span class="file-name">Arogya Supreme</span><span class="file-meta">PDF • Product Brochure</span></div>
-                <div class="action-buttons">
-                    <a href="Arogya Supreme AIO.pdf" download class="interact-btn btn-dl" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a>
-                    <button class="interact-btn btn-wa" onclick="shareWa('Arogya Supreme Brochure')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
-                </div>
-            </div>
-
+                <div class="file-icon">📘</div><div class="file-info"><span class="file-name">Arogya Supreme</span><span class="file-meta">PDF • Product Brochure</span></div>
+                <div class="action-buttons"><a href="Arogya Supreme AIO.pdf" download class="interact-btn btn-dl" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a><button class="interact-btn btn-wa" onclick="shareWa('Arogya Supreme Brochure')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button></div></div>
             <div class="file-item">
-                <div class="file-icon">📘</div>
-                <div class="file-info"><span class="file-name">Super Top-up</span><span class="file-meta">PDF • Product Brochure</span></div>
-                <div class="action-buttons">
-                    <a href="Super Top-Up.pdf" download class="interact-btn btn-dl" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a>
-                    <button class="interact-btn btn-wa" onclick="shareWa('Super Top-up Brochure')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
-                </div>
-            </div>
+                <div class="file-icon">📘</div><div class="file-info"><span class="file-name">Super Top-up</span><span class="file-meta">PDF • Product Brochure</span></div>
+                <div class="action-buttons"><a href="Super Top-Up.pdf" download class="interact-btn btn-dl" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a><button class="interact-btn btn-wa" onclick="shareWa('Super Top-up Brochure')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button></div></div>
         </div>
 
         <div id="tab-forms" class="tab-content">
             <div class="file-item">
-                <div class="file-icon">📝</div>
-                <div class="file-info"><span class="file-name">Common Proposal Form</span><span class="file-meta">Health Retail</span></div>
-                <div class="action-buttons">
-                    <button class="interact-btn btn-dl" onclick="alert('File not linked')" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></button>
-                    <button class="interact-btn btn-wa" onclick="shareWa('Proposal Form')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
-                </div>
-            </div>
+                <div class="file-icon">📑</div><div class="file-info"><span class="file-name">Annexure II</span><span class="file-meta">Non-Payable Items</span></div>
+                <div class="action-buttons"><a href="Annex II.pdf" download class="interact-btn btn-dl" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a><button class="interact-btn btn-wa" onclick="shareWa('Annexure II')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button></div></div>
+            <div class="file-item">
+                <div class="file-icon">📋</div><div class="file-info"><span class="file-name">AML Form</span><span class="file-meta">KYC Declaration</span></div>
+                <div class="action-buttons"><a href="AML Form.pdf" download class="interact-btn btn-dl" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a><button class="interact-btn btn-wa" onclick="shareWa('AML Form')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button></div></div>
+            <div class="file-item">
+                <div class="file-icon">🏥</div><div class="file-info"><span class="file-name">Claim Form</span><span class="file-meta">Reimbursement</span></div>
+                <div class="action-buttons"><a href="claim_form.pdf" download class="interact-btn btn-dl" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a><button class="interact-btn btn-wa" onclick="shareWa('Claim Form')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button></div></div>
         </div>
     </div>
 
     <div id="support" class="page">
-        <div class="nav-header">
-            <button class="back-btn" onclick="navigate('home')">&#8592;</button>
-            <div class="page-title">Support</div>
-        </div>
-
+        <div class="nav-header"><button class="back-btn" onclick="navigate('home')">&#8592;</button><div class="page-title">Support</div></div>
         <div class="section-label" style="margin-top:0;">For Intermediaries</div>
         <div class="support-card">
-            <div class="support-header">
-                <div class="support-icon">🤝</div>
-                <div class="support-title">Agents & Partners</div>
-            </div>
+            <div class="support-header"><div class="support-icon">🤝</div><div class="support-title">Agents & Partners</div></div>
             <div class="support-row">
-                <div>
-                    <div class="contact-label">Helpdesk (24/7)</div>
-                    <a href="tel:1800221111" class="contact-value">1800 22 1111</a>
-                </div>
+                <div><div class="contact-label">Helpdesk (24/7)</div><a href="tel:1800221111" class="contact-value">1800 22 1111</a></div>
                 <a href="tel:1800221111" class="interact-btn btn-call" title="Call Now">📞</a>
             </div>
         </div>
-
         <div class="section-label">For Customers (Claims)</div>
         <div class="support-card">
-            <div class="support-header">
-                <div class="support-icon">🏥</div>
-                <div class="support-title">Health Claims</div>
-            </div>
+            <div class="support-header"><div class="support-icon">🏥</div><div class="support-title">Health Claims</div></div>
             <div class="support-row">
-                <div>
-                    <div class="contact-label">Toll Free (24/7)</div>
-                    <div class="contact-value"><a href="tel:18002103366" class="contact-link">1800 210 3366</a></div>
-                    <div class="contact-value"><a href="tel:18002106366" class="contact-link">1800 210 6366</a></div>
-                </div>
+                <div><div class="contact-label">Toll Free (24/7)</div><div class="contact-value"><a href="tel:18002103366" class="contact-link">1800 210 3366</a></div><div class="contact-value"><a href="tel:18002106366" class="contact-link">1800 210 6366</a></div></div>
                 <a href="tel:18002103366" class="interact-btn btn-call" title="Call Now">📞</a>
             </div>
-            <div class="support-row">
-                <div>
-                    <div class="contact-label">Email ID</div>
-                    <a href="mailto:sbig.health@sbigeneral.in" class="email-link">sbig.health@sbigeneral.in</a>
-                </div>
-            </div>
+            <div class="support-row"><div><div class="contact-label">Email ID</div><a href="mailto:sbig.health@sbigeneral.in" class="email-link">sbig.health@sbigeneral.in</a></div></div>
         </div>
-
         <div class="section-label">For Any Query</div>
         <div class="support-card">
-            <div class="support-header">
-                <div class="support-icon">📞</div>
-                <div class="support-title">Customer Care</div>
-            </div>
-            <div class="support-row">
-                <div>
-                    <div class="contact-label">Toll Free</div>
-                    <a href="tel:18001021111" class="contact-value">1800 102 1111</a>
-                </div>
-            </div>
-            <div class="support-row">
-                <div>
-                    <div class="contact-label">Email ID</div>
-                    <a href="mailto:customer.care@sbigeneral.in" class="email-link">customer.care@sbigeneral.in</a>
-                </div>
-            </div>
+            <div class="support-header"><div class="support-icon">📞</div><div class="support-title">Customer Care</div></div>
+            <div class="support-row"><div><div class="contact-label">Toll Free</div><a href="tel:18001021111" class="contact-value">1800 102 1111</a></div></div>
+            <div class="support-row"><div><div class="contact-label">Email ID</div><a href="mailto:customer.care@sbigeneral.in" class="email-link">customer.care@sbigeneral.in</a></div></div>
         </div>
-
         <div class="section-label">Downloads</div>
         <div class="file-item" style="border: 1px solid var(--accent);">
             <div class="file-icon" style="background:#fdf2f8; color:var(--accent);">📄</div>
-            <div class="file-info">
-                <span class="file-name" style="color:var(--accent);">Claim Form</span>
-                <span class="file-meta">Reimbursement</span>
-            </div>
+            <div class="file-info"><span class="file-name" style="color:var(--accent);">Claim Form</span><span class="file-meta">Reimbursement</span></div>
             <div class="action-buttons">
                 <a href="claim_form.pdf" download class="interact-btn btn-dl" style="background:var(--accent);" title="Download"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></a>
-                <button class="interact-btn btn-wa" onclick="shareWa('Claim Form')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
-            </div>
+                <button class="interact-btn btn-wa" onclick="shareWa('Claim Form')" title="Share on WhatsApp"><svg class="btn-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button></div></div>
         </div>
-
     </div>
 
 </div>
@@ -548,7 +492,7 @@
             const rawJson = XLSX.utils.sheet_to_json(firstSheet);
             hospitalData = processRawData(rawJson);
             document.getElementById('statusLoading').style.display = 'none';
-            toggleInputMode();
+            updateSuggestions(); // Initialize datalist
         }).catch(err => {
             console.error("Auto-fetch failed:", err);
             document.getElementById('statusLoading').style.display = 'none';
@@ -570,56 +514,49 @@
             hospitalData = processRawData(rawJson);
             document.getElementById('statusError').style.display = 'none';
             document.getElementById('manualUpload').style.display = 'none';
-            toggleInputMode();
+            updateSuggestions();
         };
         reader.readAsArrayBuffer(file);
     }
 
-    /* --- UI LOGIC --- */
-    function toggleInputMode() {
+    /* --- AUTOCOMPLETE LOGIC --- */
+    function updateSuggestions() {
         const type = document.getElementById('searchType').value;
-        const textInput = document.getElementById('searchInput');
-        const dropdown = document.getElementById('searchDropdown');
-
-        if(type === 'pincode') {
-            textInput.style.display = 'block';
-            dropdown.style.display = 'none';
-            textInput.value = "";
-            textInput.placeholder = "Enter Pincode";
-        } else {
-            textInput.style.display = 'none';
-            dropdown.style.display = 'block';
-            dropdown.innerHTML = '<option value="">Select ' + type.charAt(0).toUpperCase() + type.slice(1) + '...</option>';
-            const list = Array.from(uniqueLists[type] || []).sort();
-            list.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item;
-                opt.innerText = item;
-                dropdown.appendChild(opt);
-            });
-        }
+        const datalist = document.getElementById('dynamicOptions');
+        const input = document.getElementById('searchInput');
+        
+        input.value = "";
+        input.placeholder = `Type ${type.charAt(0).toUpperCase() + type.slice(1)}...`;
+        
+        // Populate Datalist for Autocomplete
+        datalist.innerHTML = '';
+        const list = Array.from(uniqueLists[type] || []).sort();
+        list.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item;
+            datalist.appendChild(opt);
+        });
     }
 
     function performSearch() {
         const type = document.getElementById('searchType').value;
+        const input = document.getElementById('searchInput');
+        const val = input.value.toLowerCase().trim();
         const container = document.getElementById('resultsContainer');
-        const label = document.getElementById('resultLabel');
-        label.style.display = 'block';
-        container.innerHTML = '';
+        const header = document.getElementById('resultsHeader');
+        const countDisplay = document.getElementById('resultCount');
 
+        container.innerHTML = '';
+        
         if(hospitalData.length === 0) {
             container.innerHTML = '<div class="empty-state">⚠️ Database not loaded yet.</div>';
             return;
         }
 
-        let val = "";
-        if(type === 'pincode') {
-            val = document.getElementById('searchInput').value.toLowerCase().trim();
-            if(val.length < 3) { container.innerHTML = '<div class="empty-state">Enter at least 3 digits.</div>'; return; }
-        } else {
-            val = document.getElementById('searchDropdown').value;
-            if(!val) { container.innerHTML = '<div class="empty-state">Please select an option.</div>'; return; }
-            val = val.toLowerCase();
+        if(val.length < 3) {
+            container.innerHTML = '<div class="empty-state">Please select or type at least 3 characters.</div>';
+            header.style.display = 'none';
+            return;
         }
 
         const results = hospitalData.filter(h => {
@@ -628,10 +565,14 @@
             return String(rawVal).toLowerCase().includes(val);
         });
 
+        // Show Count and PDF Button
+        header.style.display = 'flex';
+        countDisplay.innerText = `Found: ${results.length} Hospitals`;
+
         if(results.length === 0) { 
             container.innerHTML = '<div class="empty-state">No network hospitals found.</div>'; 
         } else {
-            results.slice(0, 50).forEach(h => { 
+            results.slice(0, 100).forEach(h => { 
                 const card = document.createElement('div'); card.className = 'hospital-card';
                 const name = h['hospitalname'] || "Unknown Hospital";
                 const addr = h['address'] || "";
@@ -641,13 +582,40 @@
                 card.innerHTML = `<div class="hosp-icon">🏥</div><div class="hosp-details"><h4>${name}</h4><p>${addr}, ${city}<br>PIN: ${pin}</p><span class="badge">Cashless</span></div>`;
                 container.appendChild(card);
             });
-            if(results.length > 50) {
+            if(results.length > 100) {
                 const limitMsg = document.createElement('div');
                 limitMsg.style.textAlign='center'; limitMsg.style.fontSize='10px'; limitMsg.style.color='#999';
-                limitMsg.innerText = `Showing first 50 of ${results.length} results...`;
+                limitMsg.innerText = `Showing first 100 of ${results.length} results...`;
                 container.appendChild(limitMsg);
             }
         }
+    }
+
+    /* --- PDF DOWNLOAD LOGIC --- */
+    function downloadPDF() {
+        const element = document.createElement('div');
+        const val = document.getElementById('searchInput').value;
+        const count = document.getElementById('resultCount').innerText;
+        
+        // Add PDF Header
+        element.innerHTML = `
+            <div style="padding: 20px; font-family: sans-serif;">
+                <h1 style="color:#280071; text-align:center; margin-bottom:5px;">SBI General Hospital List</h1>
+                <h3 style="color:#666; text-align:center; margin-top:0;">Search Results for: "${val}"</h3>
+                <p style="text-align:center; font-size:12px; color:#888;">${count}</p>
+                <hr style="border:1px solid #eee; margin:20px 0;">
+                ${document.getElementById('resultsContainer').innerHTML}
+            </div>
+        `;
+
+        const opt = {
+            margin: 10,
+            filename: `Network_Hospitals_${val}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
     }
 </script>
 </body>
