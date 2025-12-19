@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Dashboard - SBIG Agents</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        fresh: '#10b981', // Green
+                        renewal: '#3b82f6', // Blue
+                        shikhar: '#f59e0b', // Amber/Gold
+                        sbig: '#280071', // Deep SBI Blue-ish tone for branding
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; opacity: 0; transform: translateY(10px); }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 transition-colors duration-300 font-sans antialiased h-screen flex flex-col overflow-hidden">
+
+    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-95 backdrop-blur-md transition-opacity duration-500">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 to-rose-500"></div>
+
+            <div class="text-center mb-6">
+                <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Performance Dashboard</h1>
+                
+                <div class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
+                    <i class="ph-fill ph-lock-key text-slate-500 text-xs"></i>
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">Restricted: SBIG Agents Only</span>
+                </div>
+            </div>
+            
+            <div id="uploadSection" class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100 text-center transition-all">
+                <label class="block text-xs font-bold text-blue-700 uppercase tracking-wide mb-2">1. Load Repository File</label>
+                <div class="relative group">
+                    <input type="file" id="excelInput" accept=".xlsx, .xls" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                    <button id="fileBtn" class="w-full py-2 px-4 bg-white border border-blue-300 text-blue-600 rounded-md shadow-sm group-hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
+                        <i class="ph ph-microsoft-excel-logo text-lg"></i>
+                        <span id="fileNameDisplay">Select Excel File...</span>
+                    </button>
+                </div>
+                <p id="fileHelpText" class="text-[10px] text-slate-400 mt-2">Required columns: Code, Name, Shikhar_Current...</p>
+            </div>
+
+            <form id="loginForm" class="space-y-4 opacity-50 pointer-events-none transition-opacity" title="Upload file first">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Agent Code</label>
+                    <input type="text" id="agentCodeInput" placeholder="Enter Agent Code (e.g. A001)" required
+                        class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none uppercase font-mono">
+                </div>
+                <button type="submit" 
+                    class="w-full bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900 text-white font-bold py-3 rounded-lg shadow-lg transform hover:-translate-y-0.5 transition-all">
+                    Access Dashboard
+                </button>
+            </form>
+            <div id="loginError" class="text-red-500 text-xs text-center mt-2 hidden"></div>
+            
+            <div class="mt-6 pt-4 border-t border-slate-100 text-center">
+                <p class="text-[10px] text-slate-400">Authorized for use by SBI General Insurance Agents only.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="appContainer" class="flex-1 flex flex-col opacity-0 transition-opacity duration-500 h-full pointer-events-none">
+        
+        <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 md:px-6 py-3 shadow-md z-20 flex justify-between items-center">
+            
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg shrink-0">
+                    <i class="ph ph-chart-line-up text-2xl"></i>
+                </div>
+                <div class="hidden md:block leading-tight">
+                    <h2 class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest">Performance</h2>
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Dashboard</h2>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center flex-1 px-2">
+                <h1 id="headerAgentName" class="text-lg md:text-xl font-bold text-slate-800 dark:text-white leading-none text-center truncate w-full max-w-[200px] md:max-w-md">---</h1>
+                <div class="text-xs font-mono text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded mt-1 flex items-center gap-1">
+                    <span>SBIG Agent:</span> <span id="headerAgentCode" class="font-bold">---</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 md:gap-3 shrink-0">
+                <button id="themeToggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors" title="Toggle Theme">
+                    <i class="ph ph-moon text-xl dark:hidden"></i>
+                    <i class="ph ph-sun text-xl hidden dark:block"></i>
+                </button>
+                
+                <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
+
+                <button id="logoutBtn" class="flex items-center gap-2 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-sm font-semibold transition-colors border border-rose-200">
+                    <i class="ph ph-sign-out text-lg"></i>
+                    <span class="hidden md:inline">Logout</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 p-4 relative">
+            
+            <div class="sticky top-0 z-10 py-4 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm mb-4">
+                <div class="max-w-4xl mx-auto flex justify-center">
+                    <div class="bg-white dark:bg-slate-900 p-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 inline-flex overflow-x-auto max-w-full">
+                        <button onclick="switchTab('month')" id="tab-month" class="nav-pill px-4 md:px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-600 whitespace-nowrap">Month</button>
+                        <button onclick="switchTab('year')" id="tab-year" class="nav-pill px-4 md:px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-600 whitespace-nowrap">Year (YTD)</button>
+                        <button onclick="switchTab('shikhar')" id="tab-shikhar" class="nav-pill px-4 md:px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-600 whitespace-nowrap">Shikhar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-5xl mx-auto pb-10">
+                
+                <div id="view-month" class="view-section hidden space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="calendarGrid">
+                        </div>
+                </div>
+
+                <div id="view-year" class="view-section hidden space-y-6">
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border-l-4 border-emerald-500 fade-in">
+                        <div class="flex justify-between mb-4">
+                            <span class="text-sm font-bold text-slate-400 uppercase">Fresh Business YTD</span>
+                            <i class="ph ph-plant text-2xl text-emerald-500"></i>
+                        </div>
+                        <div class="text-3xl font-bold text-slate-800 dark:text-white mb-2">₹ <span id="ytdFreshDisplay">0</span></div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mb-1">
+                            <div id="ytdFreshBar" class="bg-emerald-500 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-500">
+                            <span>Achieved</span>
+                            <span id="ytdFreshTarget">Target: 0</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border-l-4 border-blue-500 fade-in" style="animation-delay: 0.1s">
+                        <div class="flex justify-between mb-4">
+                            <span class="text-sm font-bold text-slate-400 uppercase">Renewal Business YTD</span>
+                            <i class="ph ph-arrows-clockwise text-2xl text-blue-500"></i>
+                        </div>
+                        <div class="text-3xl font-bold text-slate-800 dark:text-white mb-2">₹ <span id="ytdRenewalDisplay">0</span></div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mb-1">
+                            <div id="ytdRenewalBar" class="bg-blue-500 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-500">
+                            <span>Achieved</span>
+                            <span id="ytdRenewalTarget">Target: 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-shikhar" class="view-section hidden">
+                    <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden fade-in text-center">
+                        <div class="absolute top-0 left-0 w-full h-full opacity-10">
+                            <i class="ph ph-mountains text-[200px] absolute -bottom-10 -right-10"></i>
+                        </div>
+
+                        <div class="relative z-10">
+                            <div class="inline-block p-3 rounded-full bg-white/10 mb-4 backdrop-blur-sm">
+                                <i class="ph ph-trophy text-3xl text-yellow-400"></i>
+                            </div>
+                            <h2 class="text-lg font-medium text-slate-300 uppercase tracking-widest mb-1">Current Status</h2>
+                            <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500 mb-6" id="shikharCurrent">---</h1>
+                            
+                            <div class="bg-white/10 rounded-xl p-6 backdrop-blur-md border border-white/10 max-w-lg mx-auto">
+                                <div class="flex justify-between items-end mb-2">
+                                    <span class="text-sm text-slate-300">Next Peak: <strong id="shikharNext" class="text-white">---</strong></span>
+                                    <span class="text-xs text-yellow-300">Keep Climbing!</span>
+                                </div>
+                                <div class="h-4 bg-slate-700 rounded-full overflow-hidden relative">
+                                    <div id="shikharBar" class="h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-1000" style="width: 0%"></div>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
+                                    <span class="text-sm text-slate-400">Shortfall</span>
+                                    <span class="text-2xl font-bold text-white">₹ <span id="shikharShortfall">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- DATA STATE ---
+        let db = []; 
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        // --- DOM ELEMENTS ---
+        const fileInput = document.getElementById('excelInput');
+        const loginForm = document.getElementById('loginForm');
+        const displayFile = document.getElementById('fileNameDisplay');
+        const fileHelpText = document.getElementById('fileHelpText');
+        const loginError = document.getElementById('loginError');
+        const loginScreen = document.getElementById('loginScreen');
+        const appContainer = document.getElementById('appContainer');
+
+        // --- FILE UPLOAD HANDLER ---
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            displayFile.innerText = "Processing...";
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    
+                    // Convert to JSON
+                    db = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    // Update UI
+                    displayFile.innerHTML = `<i class="ph ph-check-circle text-emerald-600"></i> Loaded ${db.length} Agents`;
+                    fileHelpText.innerText = `File: ${file.name}`;
+                    fileHelpText.classList.add('text-emerald-600');
+                    
+                    // Enable Login
+                    enableLoginForm();
+                    
+                    console.log("Data Loaded:", db);
+                } catch (err) {
+                    alert("Error reading Excel file. Please ensure it follows the format.");
+                    displayFile.innerText = "Error Loading File";
+                    console.error(err);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function enableLoginForm() {
+            loginForm.classList.remove('opacity-50', 'pointer-events-none');
+            loginForm.removeAttribute('title');
+        }
+
+        // --- LOGIN LOGIC ---
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const code = document.getElementById('agentCodeInput').value.trim();
+            
+            // Find Agent (Case insensitive)
+            const agent = db.find(row => row.Code && row.Code.toString().toUpperCase() === code.toUpperCase());
+
+            if (!agent) {
+                loginError.innerText = "Agent Code not found in the uploaded file.";
+                loginError.classList.remove('hidden');
+                return;
+            }
+
+            // Success
+            loadDashboard(agent);
+        });
+
+        // --- LOGOUT LOGIC ---
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            // 1. Hide App
+            appContainer.classList.add('opacity-0', 'pointer-events-none');
+            
+            // 2. Show Login Screen
+            loginScreen.style.display = 'flex';
+            setTimeout(() => {
+                loginScreen.classList.remove('opacity-0', 'pointer-events-none');
+            }, 50);
+
+            // 3. Reset Input but KEEP Data
+            document.getElementById('agentCodeInput').value = '';
+            loginError.classList.add('hidden');
+        });
+
+        // --- DASHBOARD RENDER ---
+        function loadDashboard(agent) {
+            // Hide Login
+            loginScreen.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => loginScreen.style.display = 'none', 500);
+            
+            // Show App
+            appContainer.classList.remove('opacity-0', 'pointer-events-none');
+            
+            // 1. SET HEADER INFO
+            document.getElementById('headerAgentName').innerText = agent.Name || "Unknown Agent";
+            document.getElementById('headerAgentCode').innerText = agent.Code;
+
+            // 2. PROCESS DATA
+            let freshTotal = 0;
+            let renewalTotal = 0;
+            const monthlyData = [];
+
+            months.forEach(m => {
+                const f = parseFloat(agent[`Fresh_${m}`] || 0);
+                const r = parseFloat(agent[`Renewal_${m}`] || 0);
+                freshTotal += f;
+                renewalTotal += r;
+                monthlyData.push({ month: m.toUpperCase(), fresh: f, renewal: r });
+            });
+
+            // 3. RENDER MONTH VIEW
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            monthlyData.forEach((d, i) => {
+                const isZero = d.fresh === 0 && d.renewal === 0;
+                grid.innerHTML += `
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden ${isZero ? 'opacity-50 grayscale' : ''}">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-slate-700 dark:text-slate-200 text-lg">${d.month}</span>
+                            ${!isZero ? '<div class="w-2 h-2 rounded-full bg-indigo-500"></div>' : ''}
+                        </div>
+                        <div class="space-y-2">
+                            <div class="bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded border-l-4 border-emerald-500">
+                                <div class="text-[10px] text-slate-500 uppercase">Fresh</div>
+                                <div class="font-bold text-emerald-700 dark:text-emerald-400">₹ ${d.fresh.toLocaleString()}</div>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-2 rounded border-l-4 border-blue-500">
+                                <div class="text-[10px] text-slate-500 uppercase">Renewal</div>
+                                <div class="font-bold text-blue-700 dark:text-blue-400">₹ ${d.renewal.toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 4. RENDER YTD VIEW
+            document.getElementById('ytdFreshDisplay').innerText = freshTotal.toLocaleString();
+            document.getElementById('ytdRenewalDisplay').innerText = renewalTotal.toLocaleString();
+            
+            const targetFresh = agent.Target_Fresh || 5000000;
+            const targetRenewal = agent.Target_Renewal || 2000000;
+            
+            document.getElementById('ytdFreshTarget').innerText = `Target: ₹ ${targetFresh.toLocaleString()}`;
+            document.getElementById('ytdRenewalTarget').innerText = `Target: ₹ ${targetRenewal.toLocaleString()}`;
+
+            // Reset widths first to trigger animation
+            document.getElementById('ytdFreshBar').style.width = '0%';
+            document.getElementById('ytdRenewalBar').style.width = '0%';
+
+            setTimeout(() => {
+                const freshPct = Math.min((freshTotal / targetFresh) * 100, 100);
+                const renewalPct = Math.min((renewalTotal / targetRenewal) * 100, 100);
+                document.getElementById('ytdFreshBar').style.width = freshPct + '%';
+                document.getElementById('ytdRenewalBar').style.width = renewalPct + '%';
+            }, 300);
+
+            // 5. RENDER SHIKHAR
+            document.getElementById('shikharCurrent').innerText = agent.Shikhar_Current || "Base Camp";
+            document.getElementById('shikharNext').innerText = agent.Shikhar_Next || "Summit";
+            
+            const excelShortfall = agent.Shikhar_Shortfall ? parseFloat(agent.Shikhar_Shortfall) : 150000;
+            document.getElementById('shikharShortfall').innerText = excelShortfall.toLocaleString();
+            
+            document.getElementById('shikharBar').style.width = '0%';
+            setTimeout(() => {
+                document.getElementById('shikharBar').style.width = '75%';
+            }, 500);
+
+            // Open Default Tab
+            switchTab('month');
+        }
+
+        // --- TABS ---
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-pill').forEach(b => {
+                b.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg');
+                b.classList.add('text-slate-600', 'dark:text-slate-400');
+            });
+            document.getElementById(`tab-${tab}`).classList.add('bg-indigo-600', 'text-white', 'shadow-lg');
+            document.getElementById(`tab-${tab}`).classList.remove('text-slate-600', 'dark:text-slate-400');
+
+            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+            const active = document.getElementById(`view-${tab}`);
+            active.classList.remove('hidden');
+            
+            active.querySelectorAll('.fade-in').forEach(el => {
+                el.style.animation = 'none';
+                el.offsetHeight; 
+                el.style.animation = null;
+            });
+        }
+
+        // --- THEME ---
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+    </script>
+</body>
+</html>
