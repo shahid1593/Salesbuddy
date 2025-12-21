@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Health Alpha Select Premium Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        :root {
+            /* Sales Buddy 2.0 Color Palette */
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --surface: #ffffff;
+            --surface-secondary: #f8fafc;
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+            --accent-color: #764ba2; /* Deep Purple */
+            --accent-hover: #5b3a7d;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --border-color: #e2e8f0;
+            --focus-ring: rgba(118, 75, 162, 0.25);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius-md: 12px;
+            --radius-lg: 20px;
+        }
+
+        /* Global Reset */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: #f0f4f8; /* Fallback */
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background-size: cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            padding-bottom: 40px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* HEADER */
+        header.page-head {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        header.page-head h1 {
+            margin: 10px 0 0;
+            font-size: 26px;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .sbi-logo {
+            height: 45px;
+            width: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* SECTION TITLES */
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title .tag {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-color);
+            background: rgba(118, 75, 162, 0.1);
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title .tag::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-color);
+            border-radius: 50%;
+        }
+
+        .section-title .divider {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(to right, var(--border-color), transparent);
+            margin-left: 12px;
+        }
+
+        /* GRID SYSTEM */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+        .col-6 { grid-column: span 6; }
+        .col-12 { grid-column: span 12; }
+        
+        @media (max-width: 768px) {
+            .col-6 { grid-column: span 12; }
+            .container { padding: 10px; }
+            .card { padding: 16px; }
+        }
+
+        /* INPUTS */
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--surface-secondary);
+            color: var(--text-main);
+            transition: all 0.2s ease;
+            appearance: none; /* Remove default arrow for custom styling if needed */
+        }
+        
+        /* Custom Dropdown Arrow */
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+            background: #fff;
+        }
+
+        /* TOGGLE SWITCH */
+        .toggle-wrapper {
+            position: relative;
+            background: var(--surface-secondary);
+            border-radius: 99px;
+            padding: 4px;
+            display: flex;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            height: 46px;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            background: #fff;
+            border-radius: 99px;
+            top: 4px; bottom: 4px; left: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: 1;
+        }
+
+        .toggle-option {
+            flex: 1;
+            text-align: center;
+            z-index: 2;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+            border-radius: 99px;
+        }
+
+        .toggle-option.active {
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        /* MEMBER CARDS */
+        .member-card {
+            background: #fdfdfd;
+            border: 1px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            position: relative;
+        }
+
+        .band-pill {
+            display: inline-block;
+            background: var(--text-main);
+            color: #fff;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        /* BUTTONS */
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .btn {
+            border: none;
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:active { transform: translateY(1px); }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 6px 16px rgba(118, 75, 162, 0.4);
+            filter: brightness(1.05);
+        }
+
+        .btn-grey {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+        .btn-grey:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .btn-blue {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .icon-wa { width: 18px; height: 18px; fill: currentColor; }
+
+        /* RESULT SECTION DESIGN 2.0 */
+        #result-section {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            margin-top: 40px;
+            border: none;
+            position: relative;
+        }
+        
+        /* Top Decorative Bar */
+        #result-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 8px;
+            background: var(--primary-gradient);
+        }
+
+        .res-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 20px 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .res-left {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--accent-color);
+            line-height: 1.3;
+        }
+
+        .res-center {
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-main);
+        }
+
+        .res-logo { max-width: 120px; }
+
+        /* Premium Box */
+        .premium-box {
+            background: var(--primary-gradient);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            margin: 15px;
+            border-radius: var(--radius-md);
+            border: none;
+            box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+        }
+
+        .premium-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .premium-amount {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 5px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .discount-info {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Tables */
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+
+        .result-table th, .result-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .result-table th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            width: 40%;
+        }
+
+        .result-table td {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .result-table tr:last-child th, .result-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Multi Year Grid */
+        .multi-year-grid {
+            display: flex;
+            gap: 8px;
+            padding: 0 15px 15px;
+            justify-content: space-between;
+        }
+
+        .my-card {
+            flex: 1;
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 5px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .my-card.active {
+            background: #fff;
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 12px rgba(118, 75, 162, 0.15);
+            transform: scale(1.05);
+        }
+
+        .my-title { font-size: 10px; color: var(--text-secondary); font-weight: 700; margin-bottom: 4px; }
+        .my-price { font-size: 13px; font-weight: 800; color: var(--accent-color); }
+        .my-save { font-size: 9px; color: var(--success-color); font-weight: 700; margin-top: 2px; }
+
+        .disclaimer-note {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 10px 20px;
+            font-style: italic;
+        }
+
+        /* ERROR TEXT */
+        .error-text {
+            background: #fef2f2;
+            color: var(--danger-color);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            border: 1px solid #fecaca;
+            margin-top: 10px;
+        }
+
+        /* Girl Child Status Box */
+        #girlChildStatus {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 46px; /* Match input height */
+        }
+
+        /* --- PDF MODE OVERRIDES --- */
+        .pdf-mode {
+            width: 750px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 1px solid #ccc !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: white !important;
+        }
+        .pdf-mode::before { display: none; } /* Remove decorative bar for print */
+        .pdf-mode .premium-box {
+            background: #fff;
+            color: #000;
+            border: 2px solid #000;
+            box-shadow: none;
+        }
+        .pdf-mode .premium-title, .pdf-mode .premium-amount, .pdf-mode .discount-info { color: #000; }
+        .pdf-mode .result-actions { display: none !important; }
+        .pdf-mode .section-title .tag { background: #eee; color: #000; border: 1px solid #ccc; }
+        .pdf-mode .res-center { text-decoration: underline; }
+
+        /* Print Specifics */
+        @media print {
+            body { background: white; }
+            .container > *:not(#result-section) { display: none; }
+            #result-section { display: block !important; box-shadow: none; border: 1px solid #000; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <header class="page-head">
+            <img src="SBI_Logo_New.png" alt="SBI General Insurance" class="sbi-logo" onerror="this.style.display='none'">
+            <h1>Health Alpha Select</h1>
+        </header>
+
+        <section class="card" id="basic-section">
+            <div class="section-title">
+                <span class="tag"><i class="fas fa-user-circle"></i> Basic Details</span>
+                <span class="divider"></span>
+            </div>
+            <div class="grid">
+                <div class="col-12">
+                    <label>Customer Name</label>
+                    <input type="text" id="customerName" placeholder="Enter Customer Name">
+                </div>
+                <div class="col-6">
+                    <label>Sum Insured</label>
+                    <select id="sumInsured">
+                        <option>5 Lac</option>
+                        <option>7.5 Lac</option>
+                        <option selected>10 Lac</option>
+                        <option>12.5 Lac</option>
+                        <option>15 Lac</option>
+                        <option>20 Lac</option>
+                        <option>25 Lac</option>
+                        <option>30 Lac</option>
+                        <option>35 Lac</option>
+                        <option>50 Lac</option>
+                        <option>75 Lac</option>
+                        <option>1Cr</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label>Policy Type</label>
+                    <input type="hidden" id="policyType" value="Individual">
+                    <div class="toggle-wrapper">
+                        <div class="toggle-slider"></div>
+                        <div class="toggle-option active" data-val="Individual">Individual</div>
+                        <div class="toggle-option" data-val="Family Floater">Floater</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label>Combination</label>
+                    <div style="display:flex; gap:8px;">
+                        <select id="combination" style="flex:1;">
+                            <option>1A</option>
+                            <option>2A</option>
+                            <option>1A+1C</option>
+                            <option>1A+2C</option>
+                            <option>1A+3C</option>
+                            <option>1A+4C</option>
+                            <option>1A+5C</option>
+                            <option>2A+1C</option>
+                            <option>2A+2C</option>
+                            <option>2A+3C</option>
+                            <option>2A+4C</option>
+                            <option>2A+5C</option>
+                        </select>
+                        <button class="btn btn-grey" id="genMembersBtn" title="Update Members"><i class="fas fa-sync-alt"></i></button>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label>Zone</label>
+                    <input type="hidden" id="zone" value="Zone B">
+                    <div class="toggle-wrapper">
+                        <div class="toggle-slider"></div>
+                        <div class="toggle-option" data-val="Zone A">Zone A</div>
+                        <div class="toggle-option active" data-val="Zone B">Zone B</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label>Tenure</label>
+                    <select id="tenure">
+                        <option value="1">1 Year</option>
+                        <option value="2">2 Year</option>
+                        <option value="3">3 Year</option>
+                        <option value="4">4 Year</option>
+                        <option value="5">5 Year</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="card" id="members-section">
+            <div class="section-title">
+                <span class="tag"><i class="fas fa-users"></i> Member Details</span>
+                <span class="divider"></span>
+            </div>
+            <div id="membersWrap" class="grid"></div>
+            <div id="membersError" class="error-text" style="display:none;"></div>
+        </section>
+
+        <section class="card" id="modifiers-section">
+            <div class="section-title">
+                <span class="tag"><i class="fas fa-sliders-h"></i> Base Modifiers</span>
+                <span class="divider"></span>
+            </div>
+            <div class="grid">
+                <div class="col-6">
+                    <label>Room Category</label>
+                    <select id="roomCategory">
+                        <option>Single Pvt AC Room</option>
+                        <option>Twin-Sharing</option>
+                        <option>Actuals</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label>PED Waiting Period</label>
+                    <select id="pedWait">
+                        <option>3 Year</option>
+                        <option>2 Year</option>
+                        <option>1 Year</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label>Specific Waiting Period</label>
+                    <select id="specWait">
+                        <option>2 Year</option>
+                        <option>1 Year</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label>No Claim Bonus</label>
+                    <select id="ncb">
+                        <option>Upto 100%</option>
+                        <option>Upto 200%</option>
+                        <option>Upto 300%</option>
+                        <option>Upto 400%</option>
+                        <option>Upto 500%</option>
+                        <option>Upto 600%</option>
+                        <option>Upto 700%</option>
+                        <option>Upto 800%</option>
+                        <option>Upto 900%</option>
+                        <option>Upto 1000%</option>
+                        <option>No Claim Discount</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="card" id="optional-section">
+            <div class="section-title">
+                <span class="tag"><i class="fas fa-plus-circle"></i> Optional Benefits</span>
+                <span class="divider"></span>
+            </div>
+            <div class="grid">
+                <div class="col-6">
+                    <label>Consumables</label>
+                    <select id="consumables">
+                        <option>Not Opted</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label>Health Check-Up</label>
+                    <select id="healthCheck">
+                        <option>Not Opted</option>
+                        <option>Rs.3,000</option>
+                        <option>Rs.4,000</option>
+                        <option>Rs.5,000</option>
+                    </select>
+                </div>
+                <div class="col-6" id="endlessContainer">
+                    <label>Endless Sum Insured</label>
+                    <select id="endless">
+                        <option>Not Opted</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label>Reconstructive Surgery</label>
+                    <select id="reconstructive">
+                        <option>Not Opted</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+                <div class="col-6" id="opdContainer">
+                    <label>OPD Coverage</label>
+                    <select id="opd">
+                        <option>Not Opted</option>
+                    </select>
+                </div>
+                <div class="col-6" id="hospitalCashContainer">
+                    <label>Hospital Daily Cash</label>
+                    <select id="hospitalCash">
+                        <option>Not Opted</option>
+                        <option>3 Days</option>
+                        <option>5 Days</option>
+                        <option>10 Days</option>
+                    </select>
+                </div>
+                <div class="col-6" id="maternityContainer">
+                    <label>Maternity Benefit</label>
+                    <select id="maternity">
+                        <option>Not Opted</option>
+                    </select>
+                </div>
+                <div class="col-6" id="maternityWaitContainer" style="display:none;">
+                    <label>Maternity Waiting Period</label>
+                    <select id="maternityWait">
+                        <option>Choose</option>
+                        <option>1 Year</option>
+                        <option>2 Years</option>
+                        <option>3 Years</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="card" id="discounts-section">
+            <div class="section-title">
+                <span class="tag"><i class="fas fa-percent"></i> Discounts</span>
+                <span class="divider"></span>
+            </div>
+            <div class="grid">
+                <div class="col-6">
+                    <label>Welcome Discount</label>
+                    <select id="welcomeDisc">
+                        <option>No</option>
+                        <option>Yes</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label>Preferred Network</label>
+                    <select id="preferredNetwork">
+                        <option>No</option>
+                        <option>Yes</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label>Girl Child Discount (Auto)</label>
+                    <div id="girlChildStatus" class="muted" style="padding: 10px 12px; background: #f8fafc; border:1px solid #e2e8f0; border-radius: 12px; font-size:13px;">Not Applicable</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="actions primary-actions">
+            <button id="calcBtn" class="btn btn-primary"><i class="fas fa-calculator"></i> Calculate Premium</button>
+            <button id="resetBtn" class="btn btn-grey"><i class="fas fa-redo"></i> Reset</button>
+        </div>
+
+        <div id="result-section" style="display:none;">
+            <div class="res-header-row">
+                <div class="res-left">
+                    <div>PRODUCT : HEALTH ALPHA</div>
+                    <div>VARIANT : SELECT</div>
+                </div>
+                <div class="res-center"> PREMIUM QUOTE </div>
+                <div class="res-right">
+                    <img src="SBI_Logo_New.png" alt="SBI General" class="res-logo" onerror="this.style.display='none'">
+                </div>
+            </div>
+            
+            <div class="premium-box">
+                <div class="premium-title">Final Premium to be Paid (After Discount)</div>
+                <div id="finalPremium" class="premium-amount">—</div>
+                <div class="discount-info">Total Savings: <span id="discountAmt">—</span></div>
+            </div>
+            
+            <div class="section-title" style="padding: 0 15px;">
+                <span class="tag">Tenure Comparison</span>
+                <span class="divider"></span>
+            </div>
+            <div class="multi-year-grid" id="multiYearGrid">
+                </div>
+
+            <div style="padding: 0 15px;">
+                <div class="section-title">
+                    <span class="tag">Quote Details</span>
+                    <span class="divider"></span>
+                </div>
+                <table class="result-table">
+                    <tbody>
+                        <tr><th>Customer Name</th><td id="infoName"></td></tr>
+                        <tr><th>Sum Insured</th><td id="infoSI"></td></tr>
+                        <tr><th>Policy Type</th><td id="infoPT"></td></tr>
+                        <tr><th>Combination</th><td id="infoCombo"></td></tr>
+                        <tr><th>Zone / Tenure</th><td><span id="infoZone"></span> / <span id="infoTenure"></span></td></tr>
+                        <tr><th>Insured Members</th><td id="infoMembersDetailed"></td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="section-title">
+                    <span class="tag">Inbuilt Benefits</span>
+                    <span class="divider"></span>
+                </div>
+                <table class="result-table">
+                    <thead>
+                        <tr style="background:#f1f5f9;"><th>Benefit</th><th>Coverage</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>In-Patient Treatment</td><td>Upto Sum Insured</td></tr>
+                        <tr><td>Day Care Treatment</td><td>Within Sum Insured</td></tr>
+                        <tr><td>AYUSH Treatment</td><td>Within Sum Insured</td></tr>
+                        <tr><td>Domiciliary Treatment</td><td>Within Sum Insured</td></tr>
+                        <tr><td>Pre-hospitalisation</td><td>60 days</td></tr>
+                        <tr><td>Post-hospitalisation</td><td>90 days</td></tr>
+                        <tr><td>Road Ambulance</td><td>Rs.3,500</td></tr>
+                        <tr><td>Radio Cab</td><td>Rs.1,000</td></tr>
+                        <tr><td>Bariatric Surgery</td><td>Within Sum Insured</td></tr>
+                        <tr><td>Organ Donor</td><td>Upto Sum Insured</td></tr>
+                        <tr><td>Modern Treatment</td><td>Upto Sum Insured</td></tr>
+                        <tr><td>Convalescence</td><td>Rs.5,000</td></tr>
+                        <tr><td>Restore Benefit</td><td>Unlimited</td></tr>
+                        <tr><td>E-opinion</td><td>Yes</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="section-title">
+                    <span class="tag">Modifiers</span>
+                    <span class="divider"></span>
+                </div>
+                <table class="result-table">
+                    <tbody>
+                        <tr><th>Room Category</th><td id="resRoom"></td></tr>
+                        <tr><th>PED Waiting Period</th><td id="resPed"></td></tr>
+                        <tr><th>Specific Waiting Period</th><td id="resSpec"></td></tr>
+                        <tr><th>No Claim Bonus</th><td id="resNcb"></td></tr>
+                    </tbody>
+                </table>
+
+                <div class="section-title">
+                    <span class="tag">Selected Optional Benefits</span>
+                    <span class="divider"></span>
+                </div>
+                <table class="result-table">
+                    <thead>
+                        <tr style="background:#f1f5f9;"><th>Feature</th><th>Selected Option</th></tr>
+                    </thead>
+                    <tbody id="optionalChosenBody"></tbody>
+                </table>
+                
+                <div class="disclaimer-note">
+                    *This is for illustration purposes only. Final premium may vary based on exact age, health status, and underwriting guidelines.
+                </div>
+            </div>
+
+            <div class="actions result-actions" data-html2canvas-ignore="true" style="margin: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <button id="pdfBtn" class="btn btn-blue"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                <button id="waBtn" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                <button onclick="window.location.reload();" class="btn btn-grey"><i class="fas fa-times"></i> Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===========================================
+        // CALCULATION LOGIC & HELPERS
+        // ===========================================
+        const CFG = {
+            ROOM_RENT_PCT: { "Single Pvt AC Room": -7.5, "Twin-Sharing": -10.0, "Actuals": 0.0 },
+            PRE_HOSP_PCT: 0.0,
+            POST_HOSP_PCT: 3.0,
+            NCB_LOAD_PCT: {
+                "Upto 100%": 0, "Upto 200%": 5, "Upto 300%": 6, "Upto 400%": 7, "Upto 500%": 8,
+                "Upto 600%": 9, "Upto 700%": 10, "Upto 800%": 11, "Upto 900%": 12, "Upto 1000%": 13,
+                "No Claim Discount": 0
+            },
+            PED_PCT: { "3 Year": -15.0, "2 Year": 0.0, "1 Year": 30.0 },
+            SPECIFIC_PCT: { "2 Year": 0.0, "1 Year": 10.0 },
+            AMB_LIMIT_REL: 0.65,
+            RADIO_LIMIT_REL: 2.00,
+            E_OPINION_PER_MEMBER: 147,
+            ORGAN_DONOR_PER_MEMBER(si) {
+                if (si <= 1000000) return 15;
+                if (si <= 100000000) return 22;
+                return 29;
+            },
+            RESTORE_PCT(si) {
+                if (si <= 1000000) return 10.0;
+                if (si <= 100000000) return 5.0;
+                return 3.0;
+            },
+            ENDLESS_PCT(si) {
+                if (si <= 1000000) return 15.0;
+                if (si <= 100000000) return 10.0;
+                return 5.0;
+            },
+            MODERN_TREATMENT_PCT: 0.0,
+            CONSUMABLES_PCT: 10.0,
+            RECONSTRUCTIVE_PER_MEMBER: 550,
+            CONVALESCENCE_PER_MILLE: {
+                "0-17": 6.30, "18-25": 4.23, "26-30": 5.27, "31-35": 6.57, "36-40": 11.98,
+                "41-45": 14.94, "46-50": 18.63, "51-55": 23.23, "56-60": 28.97, "61-65": 36.13,
+                "66-70": 45.05, "71-75": 56.17, "76-80": 70.04, "81-85": 87.34, "85+": 108.91
+            },
+            HEALTH_CHECK_BASE: { "Rs.3,000": 1468, "Rs.4,000": 1957, "Rs.5,000": 2447 },
+            HEALTH_CHECK_REL: (eligible) => {
+                if (eligible <= 0) return 0;
+                if (eligible === 1) return 1.00;
+                if (eligible === 2) return 1.20;
+                if (eligible === 3) return 1.50;
+                return 1.65;
+            },
+            FLOATER_TIERS(members) {
+                if (members === 2) return 25.0;
+                if (members === 3) return 30.0;
+                if (members > 3) return 35.0;
+                return 0.0;
+            },
+            NON_FLOATER_END_PCT: 5.0,
+            TERM_DISCOUNT_PCT: { 1: 0, 2: 6, 3: 9, 4: 11, 5: 14 },
+            ZONE_DISCOUNT(zone) { return zone === 'Zone B' ? 20.0 : 0.0; },
+            GIRL_CHILD_PCT: 5.0,
+            WELCOME_PCT(yes) { return yes ? 5.0 : 0.0; },
+            PREFERRED_NETWORK_PCT(yes) { return yes ? 10.0 : 0.0; },
+            MAX_AGG_DISC_PCT: 45.0
+        };
+
+        const BASE_PREMIUM_TABLE = {
+            cols: ["500000", "750000", "1000000", "1250000", "1500000", "2000000", "2500000", "3000000", "3500000", "5000000", "7500000", "10000000"],
+            bands: [
+                { label: "0-17", from: 0, to: 17, vals: [5752, 6608, 6893, 7635, 8634, 9776, 10346, 10774, 11202, 12487, 13477, 14333] },
+                { label: "18-25", from: 18, to: 25, vals: [5480, 6295, 6567, 7274, 8225, 9312, 9856, 10405, 10813, 12036, 13038, 13853] },
+                { label: "26-30", from: 26, to: 30, vals: [6023, 6920, 7219, 7997, 9043, 10239, 10837, 11427, 11875, 13221, 14315, 15212] },
+                { label: "31-35", from: 31, to: 35, vals: [6567, 7545, 7872, 8720, 9861, 11166, 11818, 12449, 12938, 14406, 15593, 16571] },
+                { label: "36-40", from: 36, to: 40, vals: [8198, 9421, 9829, 10888, 12315, 13946, 14761, 15515, 16126, 17961, 19425, 20648] },
+                { label: "41-45", from: 41, to: 45, vals: [10372, 11921, 12438, 13780, 15588, 17653, 18686, 19602, 20377, 22701, 24534, 26084] },
+                { label: "46-50", from: 46, to: 50, vals: [13090, 15047, 15699, 17434, 19718, 22327, 23631, 24738, 25716, 28652, 31121, 33078] },
+                { label: "51-55", from: 51, to: 55, vals: [17982, 20673, 21570, 23941, 27080, 30668, 32462, 33935, 35280, 39317, 42618, 45309] },
+                { label: "56-60", from: 56, to: 60, vals: [22744, 26128, 27256, 30189, 34136, 38648, 40904, 42622, 44313, 49389, 53476, 56860] },
+                { label: "61-65", from: 61, to: 65, vals: [32921, 37831, 39468, 43749, 49478, 56025, 59299, 61754, 64209, 71574, 77391, 82302] },
+                { label: "66-70", from: 66, to: 70, vals: [46420, 53356, 55667, 61704, 69795, 79042, 83665, 87133, 90600, 101003, 109115, 116050] },
+                { label: "71-75", from: 71, to: 75, vals: [62603, 71965, 75086, 83226, 94149, 106632, 112874, 117555, 122237, 136280, 147143, 156506] },
+                { label: "76-80", from: 76, to: 80, vals: [84449, 97088, 101301, 112281, 127027, 143880, 152306, 158626, 164945, 183905, 198481, 211121] },
+                { label: "81-85", from: 81, to: 85, vals: [113941, 131004, 136692, 151506, 171413, 194164, 205539, 214071, 222602, 248197, 267787, 284851] },
+                { label: "85+", from: 86, to: 120, vals: [153755, 176790, 184469, 204458, 231333, 262047, 277404, 288921, 300439, 334992, 361351, 384386] }
+            ]
+        };
+
+        const PER_MEMBER_AMBULANCE = { "0-17": 21, "18-25": 14, "26-30": 18, "31-35": 22, "36-40": 27, "41-45": 34, "46-50": 43, "51-55": 53, "56-60": 66, "61-65": 83, "66-70": 103, "71-75": 129, "76-80": 161, "81-85": 200, "85+": 250 };
+        const PER_MEMBER_RADIO = { "0-17": 24, "18-25": 16, "26-30": 20, "31-35": 25, "36-40": 31, "41-45": 39, "46-50": 49, "51-55": 61, "56-60": 76, "61-65": 95, "66-70": 118, "71-75": 147, "76-80": 183, "81-85": 229, "85+": 285 };
+        
+        // Hospital Cash Data
+        const HOSPITAL_CASH_PREMIUMS = { "0-17": 301, "18-25": 204, "26-30": 257, "31-35": 324, "36-40": 413, "41-45": 517, "46-50": 647, "51-55": 825, "56-60": 1055, "61-65": 1347, "66-70": 1719, "71-75": 2190, "76-80": 2857, "81-85": 4164, "85+": 5950 };
+        const HOSPITAL_CASH_REL = { "3 Days": 0.80, "5 Days": 0.85, "10 Days": 0.90 };
+        
+        // Maternity Data
+        const MATERNITY_BASE_PREMIUM = {
+            "Rs. 50,000": { "18-35": 12053, "36-45": 10245 },
+            "Rs. 75,000": { "18-35": 18079, "36-45": 15368 }
+        };
+        const MATERNITY_WAIT_REL = { "1 Year": 1.67466666666667, "2 Years": 1.00, "3 Years": 0.80 };
+        const CHILD_VACCINATION = 2202;
+        const NEW_BORN_COVER = { 1000000: 7388, 1250000: 8183, 1500000: 9253, 2000000: 10476, 2500000: 11088, 3000000: 11706, 3500000: 12164, 5000000: 13540, 7500000: 14668, 10000000: 15585 };
+        
+        const SI_LABEL_TO_VALUE = {
+            "5 Lac": 500000, "7.5 Lac": 750000, "10 Lac": 1000000, "12.5 Lac": 1250000, "15 Lac": 1500000,
+            "20 Lac": 2000000, "25 Lac": 2500000, "30 Lac": 3000000, "35 Lac": 3500000, "50 Lac": 5000000,
+            "75 Lac": 7500000, "1Cr": 10000000
+        };
+
+        const membersWrap = document.getElementById('membersWrap');
+        const membersError = document.getElementById('membersError');
+
+        // Helpers
+        function ageBandObj(age) {
+            for (const b of BASE_PREMIUM_TABLE.bands) {
+                if (age >= b.from && age <= b.to) return b;
+            }
+            return BASE_PREMIUM_TABLE.bands[BASE_PREMIUM_TABLE.bands.length - 1];
+        }
+
+        function ageBandLabel(age) {
+            const b = ageBandObj(age);
+            return b ? b.label : null;
+        }
+
+        function basePremiumFor(age, siVal) {
+            const band = ageBandObj(age);
+            const idx = BASE_PREMIUM_TABLE.cols.indexOf(String(siVal));
+            if (!band || idx < 0) return 0;
+            return band.vals[idx];
+        }
+
+        function parseCombination(combo) {
+            const parts = combo.split('+');
+            let adults = 0, children = 0;
+            parts.forEach(p => {
+                const n = parseInt(p);
+                if (p.includes('A')) adults += n || 0;
+                if (p.includes('C')) children += n || 0;
+            });
+            return { adults, children };
+        }
+
+        function formatMoney(n) {
+            const v = (typeof n === 'number') ? n : parseFloat(n || 0);
+            return '₹ ' + Math.round(v).toLocaleString('en-IN');
+        }
+
+        // Render Inputs
+        function renderMemberRows() {
+            const combo = document.getElementById('combination').value;
+            const { adults, children } = parseCombination(combo);
+            membersWrap.innerHTML = '';
+            membersError.style.display = 'none';
+
+            for (let i = 1; i <= adults; i++) {
+                const card = document.createElement('div');
+                card.className = 'member-card col-12';
+                card.innerHTML = `
+                    <div class="band-wrap">
+                        <span class="band-pill">Adult ${i}</span>
+                    </div>
+                    <div class="grid">
+                        <div class="col-6">
+                            <label>Age</label>
+                            <input type="number" min="18" max="120" data-role="adult" data-index="${i}" class="age-input" placeholder="e.g., 34"/>
+                        </div>
+                        <div class="col-6">
+                            <label>Gender</label>
+                            <select class="gender-input" data-role="adult" data-index="${i}">
+                                <option>Male</option>
+                                <option>Female</option>
+                            </select>
+                        </div>
+                    </div>`;
+                membersWrap.appendChild(card);
+            }
+
+            for (let i = 1; i <= children; i++) {
+                const card = document.createElement('div');
+                card.className = 'member-card col-12';
+                card.innerHTML = `
+                    <div class="band-wrap">
+                        <span class="band-pill">Child ${i}</span>
+                    </div>
+                    <div class="grid">
+                        <div class="col-6">
+                            <label>Age</label>
+                            <input type="number" min="0" max="25" data-role="child" data-index="${i}" class="age-input" placeholder="≤ 25 yrs"/>
+                        </div>
+                        <div class="col-6">
+                            <label>Gender</label>
+                            <select class="gender-input" data-role="child" data-index="${i}">
+                                <option>Male</option>
+                                <option>Female</option>
+                            </select>
+                        </div>
+                    </div>`;
+                membersWrap.appendChild(card);
+            }
+            
+            // Listen for changes in member details
+            membersWrap.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('change', updateOptionalVisibility);
+                el.addEventListener('input', updateOptionalVisibility);
+            });
+            updateOptionalVisibility();
+        }
+
+        function enforcePolicyCombination() {
+            const pt = document.getElementById('policyType').value;
+            const comboSel = document.getElementById('combination');
+            const genBtn = document.getElementById('genMembersBtn');
+
+            if (pt === 'Individual') {
+                comboSel.value = '1A';
+                [...comboSel.options].forEach(opt => {
+                    opt.hidden = (opt.value !== '1A');
+                    opt.disabled = (opt.value !== '1A');
+                });
+                comboSel.disabled = true;
+                genBtn.disabled = false;
+            } else {
+                [...comboSel.options].forEach(opt => {
+                    if (opt.value === '1A') {
+                        opt.hidden = true;
+                        opt.disabled = true;
+                    } else {
+                        opt.hidden = false;
+                        opt.disabled = false;
+                    }
+                });
+                comboSel.disabled = false;
+                if (comboSel.value === '1A') { comboSel.value = '2A'; }
+                genBtn.disabled = false;
+            }
+        }
+
+        function getMembers() {
+            const list = [];
+            membersWrap.querySelectorAll('.member-card').forEach(card => {
+                const ageInp = card.querySelector('.age-input');
+                const genderSel = card.querySelector('.gender-input');
+                const role = ageInp.getAttribute('data-role');
+                const idx = ageInp.getAttribute('data-index');
+                const age = parseInt(ageInp.value);
+                const gender = genderSel.value;
+                list.push({ role, idx, age, gender });
+            });
+            return list;
+        }
+
+        function validateMembers() {
+            const inputs = membersWrap.querySelectorAll('.age-input');
+            let ok = true;
+            inputs.forEach(inp => {
+                if (inp.value.trim() === '') {
+                    ok = false;
+                    inp.style.borderColor = 'var(--danger-color)';
+                } else {
+                    inp.style.borderColor = 'var(--border-color)';
+                }
+            });
+            if (!ok) {
+                membersError.style.display = 'block';
+                membersError.textContent = 'Age is mandatory for all members.';
+                return false;
+            }
+
+            const adultAges = membersWrap.querySelectorAll('.age-input[data-role="adult"]');
+            let adultInvalid = false;
+            adultAges.forEach(inp => {
+                const val = parseInt(inp.value);
+                if (!isNaN(val) && val < 18) {
+                    adultInvalid = true;
+                    inp.style.borderColor = 'var(--danger-color)';
+                }
+            });
+            if (adultInvalid) {
+                membersError.style.display = 'block';
+                membersError.textContent = 'Minimum age for Adults is 18 years.';
+                return false;
+            }
+
+            const childAges = membersWrap.querySelectorAll('.age-input[data-role="child"]');
+            let childInvalid = false;
+            childAges.forEach(inp => {
+                const val = parseInt(inp.value);
+                if (!isNaN(val) && val > 25) {
+                    childInvalid = true;
+                    inp.style.borderColor = 'var(--danger-color)';
+                }
+            });
+            if (childInvalid) {
+                membersError.style.display = 'block';
+                membersError.textContent = 'Age of Child can be maximum 25 years.';
+                return false;
+            }
+
+            membersError.style.display = 'none';
+            return true;
+        }
+
+        function anyDaughter() {
+            const childs = membersWrap.querySelectorAll('.gender-input[data-role="child"]');
+            for (const c of childs) {
+                if (c.value === 'Female') return true;
+            }
+            return false;
+        }
+
+        // DYNAMIC OPTIONAL BENEFITS VISIBILITY
+        function updateOptionalVisibility() {
+            const siLabel = document.getElementById('sumInsured').value;
+            const siVal = SI_LABEL_TO_VALUE[siLabel] || 0;
+
+            const opdSelect = document.getElementById('opd');
+            const opdContainer = document.getElementById('opdContainer');
+            const currentOpdVal = opdSelect.value;
+            opdSelect.innerHTML = '';
+            let opdOptions = [];
+            if (siVal < 1000000) {
+                opdContainer.style.display = 'none';
+                opdOptions = ["Not Opted"];
+            } else {
+                opdContainer.style.display = 'block';
+                if (siVal <= 2500000) { opdOptions = ["Not Opted", "Rs. 5,000"]; }
+                else { opdOptions = ["Not Opted", "Rs. 10,000", "Rs. 25,000"]; }
+            }
+            opdOptions.forEach(opt => {
+                const el = document.createElement('option');
+                el.textContent = opt;
+                el.value = opt;
+                opdSelect.appendChild(el);
+            });
+            if (opdOptions.includes(currentOpdVal)) opdSelect.value = currentOpdVal;
+
+            const cashContainer = document.getElementById('hospitalCashContainer');
+            const cashSelect = document.getElementById('hospitalCash');
+            if (siVal < 1000000) {
+                cashContainer.style.display = 'none';
+                cashSelect.value = "Not Opted";
+            } else {
+                cashContainer.style.display = 'block';
+            }
+
+            const matContainer = document.getElementById('maternityContainer');
+            const matSelect = document.getElementById('maternity');
+            const currentMatVal = matSelect.value;
+            
+            let hasEligibleFemale = false;
+            const members = getMembers();
+            for(const m of members) {
+                if(m.gender === 'Female' && m.age >= 18 && m.age <= 45) {
+                    hasEligibleFemale = true;
+                    break;
+                }
+            }
+
+            matSelect.innerHTML = '';
+            let matOptions = [];
+            if (siVal < 1000000 || !hasEligibleFemale) {
+                matContainer.style.display = 'none';
+                matOptions = ["Not Opted"];
+            } else {
+                matContainer.style.display = 'block';
+                if (siVal === 1000000) { matOptions = ["Not Opted", "Rs. 50,000"]; }
+                else { matOptions = ["Not Opted", "Rs. 75,000"]; }
+            }
+            matOptions.forEach(opt => {
+                const el = document.createElement('option');
+                el.textContent = opt;
+                el.value = opt;
+                matSelect.appendChild(el);
+            });
+            if (matOptions.includes(currentMatVal)) matSelect.value = currentMatVal;
+
+            const endlessContainer = document.getElementById('endlessContainer');
+            const endlessSelect = document.getElementById('endless');
+            if (siVal < 1000000) {
+                endlessContainer.style.display = 'none';
+                endlessSelect.value = "Not Opted";
+            } else {
+                endlessContainer.style.display = 'block';
+            }
+
+            const matWaitContainer = document.getElementById('maternityWaitContainer');
+            const matWaitSelect = document.getElementById('maternityWait');
+            if (matContainer.style.display !== 'none' && matSelect.value !== 'Not Opted') {
+                if(matWaitContainer.style.display === 'none') {
+                    matWaitSelect.value = "Choose";
+                }
+                matWaitContainer.style.display = 'block';
+            } else {
+                matWaitContainer.style.display = 'none';
+                matWaitSelect.value = "Choose";
+            }
+        }
+
+        // ===========================================
+        // CORE CALCULATION ENGINE
+        // ===========================================
+        function calcPremium() {
+            if (!validateMembers()) return;
+
+            const selectedTenure = parseInt(document.getElementById('tenure').value);
+
+            // Calculate results for all tenures 1 to 5 to populate the grid
+            const result1 = calculateCumulativePremium(1);
+            const result2 = calculateCumulativePremium(2);
+            const result3 = calculateCumulativePremium(3);
+            const result4 = calculateCumulativePremium(4);
+            const result5 = calculateCumulativePremium(5);
+
+            if (!result1 || !result2 || !result3 || !result4 || !result5) return;
+
+            let resultMain;
+            if (selectedTenure === 1) resultMain = result1;
+            else if (selectedTenure === 2) resultMain = result2;
+            else if (selectedTenure === 3) resultMain = result3;
+            else if (selectedTenure === 4) resultMain = result4;
+            else resultMain = result5;
+
+            // Update UI
+            updateMainResultUI(resultMain);
+            renderMultiYearGrid(result1, result2, result3, result4, result5, selectedTenure);
+        }
+
+        function calculateCumulativePremium(tenureYears) {
+            let totalAnnualPremium = 0;
+            let totalFloaterSaving = 0;
+            
+            for (let year = 0; year < tenureYears; year++) {
+                const annualResult = calculateAnnualPremiumForYear(year);
+                if (!annualResult) return null;
+
+                totalAnnualPremium += annualResult.annualStep2;
+                totalFloaterSaving += annualResult.floaterAmt;
+            }
+
+            const zone = document.getElementById('zone').value;
+            const welcomeDisc = document.getElementById('welcomeDisc').value === 'Yes';
+            const preferredNetwork = document.getElementById('preferredNetwork').value === 'Yes';
+            
+            const minBaseAfterCap = totalAnnualPremium * (1 - CFG.MAX_AGG_DISC_PCT / 100);
+
+            const hasGirlChild = anyDaughter();
+            const girlPct = hasGirlChild ? CFG.GIRL_CHILD_PCT : 0;
+            
+            const termPct = CFG.TERM_DISCOUNT_PCT[tenureYears] || 0;
+            const zonePct = CFG.ZONE_DISCOUNT(zone);
+            const welcomePct = CFG.WELCOME_PCT(welcomeDisc);
+            const preferredPct = CFG.PREFERRED_NETWORK_PCT(preferredNetwork);
+
+            let baseForDiscount = totalAnnualPremium;
+
+            let discComponents = [
+                ["Zone Discount", zonePct],
+                ["Girl Child Discount", girlPct],
+                ["Preferred Network", preferredPct],
+                ["Welcome Discount", welcomePct],
+                ["Term Discount", termPct]
+            ];
+
+            discComponents.forEach(([name, pct]) => {
+                if (pct <= 0) return;
+                let intendedAmt = baseForDiscount * (pct / 100);
+                let baseAfter = baseForDiscount - intendedAmt;
+                if (baseAfter < minBaseAfterCap) {
+                    intendedAmt = baseForDiscount - Math.max(minBaseAfterCap, 0);
+                    baseAfter = baseForDiscount - intendedAmt;
+                }
+                baseForDiscount = baseAfter;
+            });
+
+            const totalDiscountAmount = totalAnnualPremium - baseForDiscount;
+            let finalPremium = Math.max(0, baseForDiscount);
+
+            return {
+                finalPremium,
+                totalDiscountAmount: totalDiscountAmount + totalFloaterSaving, 
+                hasGirlChild,
+                termDiscountPct: termPct
+            };
+        }
+
+        function calculateAnnualPremiumForYear(yearOffset) {
+            const siLabel = document.getElementById('sumInsured').value;
+            const siVal = SI_LABEL_TO_VALUE[siLabel];
+            const pt = document.getElementById('policyType').value;
+            const combo = document.getElementById('combination').value;
+            const room = document.getElementById('roomCategory').value;
+            const pedSel = document.getElementById('pedWait').value;
+            const specSel = document.getElementById('specWait').value;
+            const ncbSel = document.getElementById('ncb').value;
+            const consumables = document.getElementById('consumables').value;
+            const healthCheck = document.getElementById('healthCheck').value;
+            const endless = document.getElementById('endless').value;
+            const reconstructive = document.getElementById('reconstructive').value;
+            const opd = document.getElementById('opd').value;
+            const hospitalCash = document.getElementById('hospitalCash').value;
+            const maternity = document.getElementById('maternity').value;
+            const maternityWait = document.getElementById('maternityWait').value;
+
+            const { adults, children } = parseCombination(combo);
+            const memberCount = adults + children;
+            if ((pt === 'Family Floater' || pt === 'Individual Floater') && memberCount < 2) {
+                membersError.style.display = 'block';
+                membersError.textContent = 'Minimum 2 members required for Floater policies.';
+                return null;
+            }
+
+            const members = getMembers();
+            const totalMembers = members.length;
+
+            const membersWithAge = members.map(m => {
+                const increasedAge = m.age + yearOffset;
+                const effectiveAge = Math.min(increasedAge, 120);
+                
+                const base = basePremiumFor(effectiveAge, siVal);
+                const bandLabel = ageBandLabel(effectiveAge);
+                return { ...m, age: effectiveAge, base, bandLabel };
+            });
+
+            const baseSum = membersWithAge.reduce((s, m) => s + m.base, 0);
+
+            const roomPct = CFG.ROOM_RENT_PCT[room] || 0;
+            const prePct = CFG.PRE_HOSP_PCT;
+            const postPct = CFG.POST_HOSP_PCT;
+            const ncbPct = CFG.NCB_LOAD_PCT[ncbSel] ?? 0;
+            const pedPct = CFG.PED_PCT[pedSel] ?? 0;
+            const specPct = CFG.SPECIFIC_PCT[specSel] ?? 0;
+
+            const baseWithModifiers = baseSum * (1 + (roomPct + prePct + postPct + ncbPct + pedPct + specPct) / 100);
+
+            const ambulanceAmt = membersWithAge.reduce((s, m) => s + (PER_MEMBER_AMBULANCE[m.bandLabel] || 0) * CFG.AMB_LIMIT_REL, 0);
+            const radioCabAmt = membersWithAge.reduce((s, m) => s + (PER_MEMBER_RADIO[m.bandLabel] || 0) * CFG.RADIO_LIMIT_REL, 0);
+            const organDonorAmt = CFG.ORGAN_DONOR_PER_MEMBER(siVal) * totalMembers;
+            const eOpinionAmt = CFG.E_OPINION_PER_MEMBER * totalMembers;
+            const restoreAmt = baseWithModifiers * (CFG.RESTORE_PCT(siVal) / 100);
+            const consumablesAmt = (consumables === 'Yes') ? baseWithModifiers * (CFG.CONSUMABLES_PCT / 100) : 0;
+            const endlessAmt = (endless === 'Yes') ? baseWithModifiers * (CFG.ENDLESS_PCT(siVal) / 100) : 0;
+            const modernAmt = baseWithModifiers * (CFG.MODERN_TREATMENT_PCT / 100);
+            const reconstructiveAmt = (reconstructive === 'Yes') ? (CFG.RECONSTRUCTIVE_PER_MEMBER * totalMembers) : 0;
+
+            const OPD_BASE = 9175;
+            const OPD_LIMIT_REL = { "Rs. 5,000": 0.30, "Rs. 10,000": 0.60, "Rs. 25,000": 1.00, "Not Opted": 0.0 };
+            function getOpdMemberFactor(n) {
+                if (n === 1) return 1.00;
+                if (n === 2) return 1.20;
+                if (n === 3) return 1.40;
+                return 1.50;
+            }
+            let opdAmt = 0;
+            if (opd !== "Not Opted") {
+                const limitRel = OPD_LIMIT_REL[opd] || 0;
+                const memberRel = getOpdMemberFactor(totalMembers);
+                opdAmt = (OPD_BASE * limitRel * memberRel) * 0.90;
+            }
+
+            let hospitalCashAmt = 0;
+            if (hospitalCash !== "Not Opted") {
+                const dayRel = HOSPITAL_CASH_REL[hospitalCash] || 0;
+                hospitalCashAmt = membersWithAge.reduce((sum, m) => {
+                    const agePremium = HOSPITAL_CASH_PREMIUMS[m.bandLabel] || 0;
+                    return sum + ((agePremium * dayRel) * 0.597004515537621);
+                }, 0);
+            }
+
+            let maternityTotalAmt = 0;
+            if (maternity !== "Not Opted" && maternityWait !== "Choose") {
+                const waitRelativity = MATERNITY_WAIT_REL[maternityWait] || 0;
+                const newbornCover = NEW_BORN_COVER[siVal] || 0;
+                membersWithAge.forEach(m => {
+                    if (m.gender === 'Female' && m.age >= 18 && m.age <= 45) {
+                        let ageKey = null;
+                        if (m.age >= 18 && m.age <= 35) ageKey = "18-35";
+                        else if (m.age >= 36 && m.age <= 45) ageKey = "36-45";
+                        if (ageKey) {
+                            const baseMatPrem = MATERNITY_BASE_PREMIUM[maternity][ageKey];
+                            maternityTotalAmt += (baseMatPrem * waitRelativity) + CHILD_VACCINATION + newbornCover;
+                        }
+                    }
+                });
+            }
+
+            let step1Subtotal = baseWithModifiers + ambulanceAmt + radioCabAmt + organDonorAmt + eOpinionAmt + restoreAmt + consumablesAmt + endlessAmt + modernAmt + reconstructiveAmt;
+
+            let floaterAmt = 0;
+            if (pt === 'Family Floater') {
+                floaterAmt = step1Subtotal * (CFG.FLOATER_TIERS(totalMembers) / 100);
+                step1Subtotal -= floaterAmt;
+            }
+
+            const CONV_LIMIT = 5000;
+            const convalescenceAmt = membersWithAge.reduce((s, m) => {
+                const rate = CFG.CONVALESCENCE_PER_MILLE[m.bandLabel] || 0;
+                return s + (CONV_LIMIT * rate / 1000);
+            }, 0);
+
+            let healthCheckAmt = 0;
+            const eligibleHCCount = membersWithAge.filter(m => m.age >= 18).length;
+            if (healthCheck !== 'Not Opted') {
+                const baseHC = CFG.HEALTH_CHECK_BASE[healthCheck] || 0;
+                const rel = CFG.HEALTH_CHECK_REL(eligibleHCCount);
+                healthCheckAmt = Math.round(baseHC * rel);
+            }
+
+            const annualStep2 = step1Subtotal + convalescenceAmt + healthCheckAmt + opdAmt + hospitalCashAmt + maternityTotalAmt;
+
+            return { annualStep2, floaterAmt };
+        }
+
+        // ===========================================
+        // UI UPDATE FUNCTIONS
+        // ===========================================
+        function updateMainResultUI(res) {
+            const custName = document.getElementById('customerName').value;
+            const siLabel = document.getElementById('sumInsured').value;
+            const pt = document.getElementById('policyType').value;
+            const combo = document.getElementById('combination').value;
+            const zone = document.getElementById('zone').value;
+            const tenureText = document.getElementById('tenure').options[document.getElementById('tenure').selectedIndex].text;
+            const room = document.getElementById('roomCategory').value;
+            const pedSel = document.getElementById('pedWait').value;
+            const specSel = document.getElementById('specWait').value;
+            const ncbSel = document.getElementById('ncb').value;
+
+            const gcStatusBox = document.getElementById('girlChildStatus');
+            if (res.hasGirlChild) {
+                gcStatusBox.textContent = "Applied (5%)";
+                gcStatusBox.style.color = "var(--success-color)";
+                gcStatusBox.style.fontWeight = "800";
+                gcStatusBox.style.borderColor = "var(--success-color)";
+                gcStatusBox.style.background = "#e6f4ea";
+            } else {
+                gcStatusBox.textContent = "Not Applicable";
+                gcStatusBox.style.color = "var(--text-secondary)";
+                gcStatusBox.style.fontWeight = "normal";
+                gcStatusBox.style.borderColor = "var(--border-color)";
+                gcStatusBox.style.background = "#f8fafc";
+            }
+
+            const resultSec = document.getElementById('result-section');
+            resultSec.style.display = 'block';
+            document.querySelector('.result-actions').style.display = 'flex';
+            document.querySelector('.result-actions').style.justifyContent = 'center';
+            resultSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            document.getElementById('finalPremium').textContent = formatMoney(res.finalPremium);
+            document.getElementById('discountAmt').textContent = formatMoney(res.totalDiscountAmount);
+            document.getElementById('infoName').textContent = custName || "—";
+            document.getElementById('infoSI').textContent = siLabel;
+            document.getElementById('infoPT').textContent = pt;
+            document.getElementById('infoCombo').textContent = combo;
+            document.getElementById('infoZone').textContent = zone;
+            document.getElementById('infoTenure').textContent = tenureText;
+            document.getElementById('resRoom').textContent = room;
+            document.getElementById('resPed').textContent = pedSel;
+            document.getElementById('resSpec').textContent = specSel;
+            document.getElementById('resNcb').textContent = ncbSel;
+
+            const members = getMembers();
+            const memList = members.map(m => `${m.role.charAt(0).toUpperCase() + m.role.slice(1)} ${m.idx} (${m.age}y ${m.gender})`).join(', ');
+            document.getElementById('infoMembersDetailed').textContent = memList;
+
+            const optBody = document.getElementById('optionalChosenBody');
+            optBody.innerHTML = '';
+            
+            const consumables = document.getElementById('consumables').value;
+            const healthCheck = document.getElementById('healthCheck').value;
+            const endless = document.getElementById('endless').value;
+            const reconstructive = document.getElementById('reconstructive').value;
+            const opd = document.getElementById('opd').value;
+            const hospitalCash = document.getElementById('hospitalCash').value;
+            const maternity = document.getElementById('maternity').value;
+            const maternityWait = document.getElementById('maternityWait').value;
+
+            const rows = [
+                ["Consumables", consumables],
+                ["Health Check-Up", healthCheck],
+                ["Endless Sum Insured", endless],
+                ["Reconstructive Surgery", reconstructive],
+                ["OPD Coverage", opd],
+                ["Hospital Daily Cash", hospitalCash],
+                ["Maternity Benefit", maternity]
+            ];
+
+            if (maternity !== "Not Opted" && maternityWait !== "Choose") {
+                rows.push(["Maternity Waiting Period", maternityWait]);
+            }
+
+            rows.forEach(([name, status]) => {
+                if (status !== 'Not Opted' && status !== 'No') {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${name}</td><td>${status}</td>`;
+                    optBody.appendChild(tr);
+                }
+            });
+
+            if (optBody.children.length === 0) {
+                optBody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#6b7280; font-style:italic;">No Optional Benefits Selected</td></tr>';
+            }
+        }
+
+        function renderMultiYearGrid(r1, r2, r3, r4, r5, selected) {
+            const grid = document.getElementById('multiYearGrid');
+            grid.innerHTML = '';
+
+            const items = [
+                { yr: 1, val: r1.finalPremium, save: r1.termDiscountPct },
+                { yr: 2, val: r2.finalPremium, save: r2.termDiscountPct },
+                { yr: 3, val: r3.finalPremium, save: r3.termDiscountPct },
+                { yr: 4, val: r4.finalPremium, save: r4.termDiscountPct },
+                { yr: 5, val: r5.finalPremium, save: r5.termDiscountPct }
+            ];
+
+            items.forEach(item => {
+                const el = document.createElement('div');
+                el.className = `my-card ${item.yr === selected ? 'active' : ''}`;
+                
+                let saveText = item.save > 0 ? `Save ${item.save}%` : 'Standard';
+                
+                el.innerHTML = `
+                    <div class="my-title">${item.yr} Year</div>
+                    <div class="my-price">${formatMoney(item.val)}</div>
+                    <div class="my-save">${saveText}</div>
+                `;
+                grid.appendChild(el);
+            });
+        }
+
+        // ===========================================
+        // EVENT LISTENERS & INIT
+        // ===========================================
+        document.getElementById('genMembersBtn').addEventListener('click', renderMemberRows);
+        document.getElementById('calcBtn').addEventListener('click', calcPremium);
+        document.getElementById('resetBtn').addEventListener('click', () => { window.location.reload(); });
+        document.getElementById('maternity').addEventListener('change', updateOptionalVisibility);
+        document.getElementById('sumInsured').addEventListener('change', updateOptionalVisibility);
+
+        function initToggles() {
+            document.querySelectorAll('.toggle-wrapper').forEach(wrapper => {
+                const hiddenInput = wrapper.previousElementSibling;
+                const options = wrapper.querySelectorAll('.toggle-option');
+                const slider = wrapper.querySelector('.toggle-slider');
+
+                const moveSlider = (targetOption) => {
+                    const left = targetOption.offsetLeft;
+                    const width = targetOption.offsetWidth;
+                    slider.style.transform = `translateX(${left}px)`;
+                    slider.style.width = `${width}px`;
+                };
+
+                const activeOpt = wrapper.querySelector('.toggle-option.active');
+                if (activeOpt) { setTimeout(() => moveSlider(activeOpt), 50); }
+
+                options.forEach(opt => {
+                    opt.addEventListener('click', () => {
+                        options.forEach(o => o.classList.remove('active'));
+                        opt.classList.add('active');
+                        moveSlider(opt);
+                        const newVal = opt.getAttribute('data-val');
+                        hiddenInput.value = newVal;
+                        hiddenInput.dispatchEvent(new Event('change'));
+                    });
+                });
+
+                window.addEventListener('resize', () => {
+                    const currentActive = wrapper.querySelector('.toggle-option.active');
+                    if (currentActive) moveSlider(currentActive);
+                });
+            });
+        }
+
+        initToggles();
+        ['policyType', 'combination', 'zone', 'tenure'].forEach(id => {
+            document.getElementById(id).addEventListener('change', () => {
+                if (id === 'policyType') { enforcePolicyCombination(); }
+                if (id === 'policyType' || id === 'combination') renderMemberRows();
+            });
+        });
+
+        enforcePolicyCombination();
+        renderMemberRows();
+        updateOptionalVisibility();
+
+        // ===========================================
+        // PDF DOWNLOAD LOGIC - FULL PAGE FIX
+        // ===========================================
+        document.getElementById('pdfBtn').addEventListener('click', function() {
+            const element = document.getElementById('result-section');
+            if (element.style.display === 'none') {
+                alert("Please Calculate Premium first.");
+                return;
+            }
+            
+            // 1. Force PDF specific width class
+            element.classList.add('pdf-mode');
+
+            // 2. Configuration for A4
+            const opt = {
+                margin:       10, // Increased margin
+                filename:     'Health_Alpha_Quote.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    scrollY: 0,
+                    // Remove windowWidth to let it respect CSS width
+                },
+                jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: 'avoid-all' }
+            };
+
+            // 3. Generate and cleanup
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.classList.remove('pdf-mode');
+            }).catch(err => {
+                console.error("PDF Failed:", err);
+                alert("PDF generation failed.");
+                element.classList.remove('pdf-mode');
+            });
+        });
+
+        // ===========================================
+        // WHATSAPP SHARE LOGIC
+        // ===========================================
+        document.getElementById('waBtn').addEventListener('click', async () => {
+            const resultSec = document.getElementById('result-section');
+            if (resultSec.style.display === 'none') {
+                alert("Please Calculate Premium first before sharing.");
+                return;
+            }
+
+            const custName = document.getElementById('infoName').textContent;
+            const premium = document.getElementById('finalPremium').textContent;
+            const si = document.getElementById('infoSI').textContent;
+            const policyType = document.getElementById('infoPT').textContent;
+            const zone = document.getElementById('infoZone').textContent;
+            const tenure = document.getElementById('infoTenure').textContent;
+            const combination = document.getElementById('infoCombo').textContent;
+            const memberData = getMembers();
+            const memberAges = memberData.map(m => m.age).join(', ');
+
+            let msg = `*Health Alpha Quote* 🏥\n\n`;
+            if (custName && custName !== "—") { msg += `*Customer Name:* ${custName} \n`; }
+            msg += `*Final Premium:* ${premium} \n`;
+            msg += `-----------------------------\n`;
+            msg += `*Sum Insured:* ${si}\n`;
+            msg += `*Policy Type:* ${policyType}\n`;
+            msg += `*Zone / Tenure:* ${zone} / ${tenure}\n`;
+            msg += `*Combination:* ${combination}\n`;
+            msg += `*Member Ages:* ${memberAges}\n`;
+            msg += `-----------------------------\n`;
+            msg += `_Please find the attached quote for more details_`;
+
+            try {
+                const btn = document.getElementById('waBtn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+                // Use same pdf mode for sharing
+                resultSec.classList.add('pdf-mode');
+
+                const opt = {
+                    margin:       10,
+                    filename:     'Health_Alpha_Quote.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                    jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' },
+                    pagebreak:    { mode: 'avoid-all' }
+                };
+
+                const pdfBlob = await html2pdf().set(opt).from(resultSec).output('blob');
+                
+                // Remove class immediately
+                resultSec.classList.remove('pdf-mode');
+
+                const pdfFile = new File([pdfBlob], "Health_Alpha_Quote.pdf", { type: "application/pdf" });
+
+                if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+                    await navigator.share({
+                        files: [pdfFile],
+                        title: 'Health Alpha Quote',
+                        text: msg
+                    });
+                } else {
+                    alert("On desktop, we will download the PDF. Please attach it manually to WhatsApp Web.");
+                    const url = URL.createObjectURL(pdfBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Health_Alpha_Quote.pdf';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    setTimeout(() => {
+                        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+                    }, 1000);
+                }
+                btn.innerHTML = originalText;
+            } catch (error) {
+                console.error("Error sharing:", error);
+                alert("Sharing failed or cancelled.");
+                document.getElementById('waBtn').innerHTML = originalText || '<i class="fab fa-whatsapp"></i> WhatsApp';
+                resultSec.classList.remove('pdf-mode');
+            }
+        });
+    </script>
+</body>
+</html>
