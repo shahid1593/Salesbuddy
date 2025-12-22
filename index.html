@@ -19,8 +19,8 @@
             --cyan: #00A3E0;          /* SBI Cyan */
             --green: #059669;         /* Success Green */
             --orange: #f97316;        /* Support Orange */
-            --indigo: #6366f1;        /* Dashboard Indigo */
             --whatsapp: #25D366;      /* WhatsApp Green */
+            --indigo: #6366f1;        /* Dashboard Indigo */
             
             --bg-body: #f8fafc;
             --surface: #ffffff;
@@ -252,14 +252,6 @@
             <div class="section-label">Tools & Resources</div>
             <div class="dashboard-grid">
                 
-                <div class="action-card" onclick="openExternal('Dashboard.html', 'Performance Dashboard')">
-                    <div class="card-content">
-                        <div class="card-icon-box icon-indigo">📊</div>
-                        <div class="card-text"><h3>Performance Dashboard</h3><p>Track your business</p></div>
-                    </div>
-                    <div class="arrow-icon">&#10095;</div>
-                </div>
-
                 <div class="action-card" onclick="navigate('selection')">
                     <div class="card-content">
                         <div class="card-icon-box icon-blue">⚡</div>
@@ -294,7 +286,7 @@
 
             </div>
         </div>
-        <div class="footer">Version 8.0 (Dashboard Added) | Internal Use Only</div>
+        <div class="footer">Version 8.1 (Hidden Dashboard) | Internal Use Only</div>
     </div>
 
     <div id="selection" class="page">
@@ -303,10 +295,10 @@
             <div class="page-title">Select Product</div>
         </div>
         <div class="dashboard-grid">
-            <div class="action-card" onclick="navigate('alpha-variants')">
+            <div class="action-card" onclick="openExternal('alpha_cal.html', 'Health Alpha')">
                 <div class="card-content">
                     <div class="card-icon-box icon-blue">🏥</div>
-                    <div class="card-text"><h3>Health Alpha</h3><p>Select Variant</p></div>
+                    <div class="card-text"><h3>Health Alpha</h3><p>Open Calculator</p></div>
                 </div>
                 <div class="arrow-icon">&#10095;</div>
             </div>
@@ -321,35 +313,10 @@
         </div>
     </div>
 
-    <div id="alpha-variants" class="page">
-        <div class="nav-header">
-            <button class="back-btn" onclick="navigate('selection')">&#8592;</button>
-            <div class="page-title">Alpha Variants</div>
-        </div>
-        <div class="section-label">Choose Plan Type</div>
-        <div class="dashboard-grid">
-            <div class="action-card" onclick="openExternal('alpha_select', 'Alpha Select')">
-                <div class="card-content">
-                    <div class="card-icon-box icon-cyan">S</div>
-                    <div class="card-text"><h3>Alpha Select</h3><p>Standard Variant</p></div>
-                </div>
-                <div class="arrow-icon">&#10095;</div>
-            </div>
-            
-            <div class="action-card" onclick="openExternal('alpha_ultimate', 'Alpha Ultimate')">
-                <div class="card-content">
-                    <div class="card-icon-box icon-indigo">U</div>
-                    <div class="card-text"><h3>Alpha Ultimate</h3><p>Premium Variant</p></div>
-                </div>
-                <div class="arrow-icon">&#10095;</div>
-            </div>
-        </div>
-    </div>
-
     <div id="external-view" class="page" style="padding-left:0; padding-right:0; padding-bottom:0;">
         <div class="nav-header" style="padding: 10px 20px;">
             <button class="back-btn" onclick="handleBack()">&#8592;</button>
-            <div class="page-title" id="external-title">Viewer</div>
+            <div class="page-title" id="external-title">Calculator</div>
         </div>
         <iframe id="external-frame" style="width:100%; height: calc(100vh - 100px); border:none; display:block;" src=""></iframe>
     </div>
@@ -492,10 +459,8 @@
             const currentTitle = document.getElementById('external-title').innerText;
             if (currentTitle === 'Performance Dashboard') {
                 navigate('home'); // Dashboard goes back to Home
-            } else if (currentTitle === 'Alpha Select' || currentTitle === 'Alpha Ultimate') {
-                navigate('alpha-variants'); // Alpha calculators go back to Alpha Variants
             } else {
-                navigate('selection'); // Other calculators (Super Health) go back to Selection
+                navigate('selection'); // Calculators go back to Selection
             }
         } else {
             // Default fallback
@@ -626,6 +591,7 @@
             return String(rawVal).toLowerCase().includes(val);
         });
 
+        // Show Count and PDF Button
         header.style.display = 'flex';
         countDisplay.innerText = `Found: ${results.length} Hospitals`;
 
