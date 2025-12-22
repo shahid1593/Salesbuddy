@@ -406,7 +406,7 @@
                 <label class="checkbox-label" id="lbl_walk">
                     <input type="checkbox" id="opt_walk"> Walk Healthy Benefit
                 </label>
-                <div id="walk_note" class="opt-note">Available for Elite, Premier, Platinum & Infinite</div>
+                <div id="walk_note" class="opt-note" style="display:none;"></div>
             </div>
 
             <button type="button" class="btn-calc" onclick="calculate()">Calculate Premium</button>
@@ -794,16 +794,10 @@
         wellnessCheck.disabled = false;
         wellnessLabel.classList.remove('disabled');
 
-        if(variant === 'Prime') {
-            walkCheck.checked = false;
-            walkCheck.disabled = true;
-            walkLabel.classList.add('disabled');
-            walkNote.style.display = 'block';
-        } else {
-            walkCheck.disabled = false;
-            walkLabel.classList.remove('disabled');
-            walkNote.style.display = 'none';
-        }
+        // FIXED: WALK HEALTHY NOW ENABLED FOR PRIME TOO
+        walkCheck.disabled = false;
+        walkLabel.classList.remove('disabled');
+        walkNote.style.display = 'none';
     }
 
     function getAgeBand(age) {
@@ -1111,7 +1105,7 @@
 
             doc.text(`Variant: ${currentQuote.variant}`, leftCol, startY + lineH);
             doc.text(`Age of Eldest: ${currentQuote.age} Years`, centerCol, startY + lineH);
-            doc.text(`Sum Insured: INR ${currentQuote.si.toLocaleString('en-IN')}`, rightCol, startY + lineH);
+            doc.text(`Sum Insured: Rs. ${currentQuote.si.toLocaleString('en-IN')}`, rightCol, startY + lineH);
 
             doc.text(`Family Size: ${currentQuote.family}`, leftCol, startY + (lineH * 2));
             doc.text(`Policy Type: ${document.getElementById('policyType').value.toUpperCase()}`, centerCol, startY + (lineH * 2));
